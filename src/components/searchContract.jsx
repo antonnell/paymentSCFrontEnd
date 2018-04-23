@@ -16,6 +16,14 @@ class ViewContract extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+
+    this.onKeyDown = this.onKeyDown.bind(this);
+  };
+
+  onKeyDown(event) {
+    if (event.which == 13) {
+      this.props.submitSearchContract()
+    }
   };
 
   render() {
@@ -28,10 +36,11 @@ class ViewContract extends Component {
                 <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Search for Contract</Typography></Grid>
                 <Grid item xs={12}><Typography align='center'>{"For more information, head over to https://www.bitdiem.com/"}</Typography></Grid>
                 <Grid item xs={12} >
-                  <TextField required fullWidth={true} color="textSecondary" required error={this.props.searchContractError} disabled={this.props.loading}
+                  <TextField required fullWidth={true} color="textSecondary" required error={this.props.searchContractError} autoFocus disabled={this.props.loading}
                     id="searchContract" label="ENS Name or Contract Address" value={this.props.searchContract}
                     onChange={this.props.handleChange('searchContract')} margin="normal"
-                    helperText={"The contract name"}/>
+                    helperText={"The contract name"}
+                    onKeyDown={this.onKeyDown}/>
                 </Grid>
                 <Grid item xs={12} style={{marginTop:10,marginBottom:10}}></Grid>
               </Grid>

@@ -13,19 +13,25 @@ import IconButton from 'material-ui/IconButton';
 import Button from 'material-ui/Button';
 import Tooltip from 'material-ui/Tooltip';
 
+import MetamaskRequired from './components/metamaskRequired.jsx';
 import SearchContract from './components/searchContract.jsx';
 import ViewContract from './components/viewContract.jsx';
 import DepositContract from './components/depositContract.jsx';
 import WithdrawContract from './components/withdrawContract.jsx';
 import SetupContract from './components/setupContract.jsx';
+import ErrorModal from './components/errorModal.jsx';
+import UpdateContractPayer from './components/updateContractPayer.jsx';
+import UpdateContractPayee from './components/updateContractPayee.jsx';
+import PendingApprovals from './components/pendingApprovals.jsx';
+
+
+const Config = require('./config.js');
 
 const Eth = require('ethjs-query')
 const EthContract = require('ethjs-contract')
 
 const isEthereumAddress  = require('is-ethereum-address');
 const fs = require('fs');
-
-const Config = require('./config.js');
 
 function SearchIcon(props) {
   return (
@@ -96,7 +102,7 @@ class App extends Component {
       bitDiemError: false,
       ensName: '',
       ensNameError: false,
-      errored: false,
+      error: null,
 
       depositContract: '',
       depositContractError: false,
@@ -119,33 +125,54 @@ class App extends Component {
     this.submitWithdrawContract = this.submitWithdrawContract.bind(this);
     this.submitSearchContract = this.submitSearchContract.bind(this);
     this.submitStartContract = this.submitStartContract.bind(this);
+    this.submitTerminateContract = this.submitTerminateContract.bind(this);
+    this.submitUpdatePayee = this.submitUpdatePayee.bind(this);
+    this.submitUpdatePayer = this.submitUpdatePayer.bind(this);
+
     this.submitCreateNavigate = this.submitCreateNavigate.bind(this);
     this.submitDepositNavigate = this.submitDepositNavigate.bind(this);
+    this.submitUpdatePayerNavigate = this.submitUpdatePayerNavigate.bind(this);
+    this.submitUpdatePayeeNavigate = this.submitUpdatePayeeNavigate.bind(this);
     this.submitWithdrawNavigate = this.submitWithdrawNavigate.bind(this);
     this.submitSearchNavigate = this.submitSearchNavigate.bind(this);
+    this.submitApprovalsNavigate = this.submitApprovalsNavigate.bind(this);
+    this.submitPayeeApprove = this.submitPayeeApprove.bind(this);
+    this.submitPayeeReject = this.submitPayeeReject.bind(this);
+    this.submitPayerApprove = this.submitPayerApprove.bind(this);
+    this.submitPayerReject = this.submitPayerReject.bind(this);
 
     this.processSetupContract = this.processSetupContract.bind(this);
     this.processFundContract = this.processFundContract.bind(this);
     this.processWithdrawContract = this.processWithdrawContract.bind(this);
+    this.processUpdatePayee = this.processUpdatePayee.bind(this);
+    this.processUpdatePayeeRequest = this.processUpdatePayeeRequest.bind(this);
+    this.processUpdatePayer = this.processUpdatePayer.bind(this);
+    this.processUpdatePayerRequest = this.processUpdatePayerRequest.bind(this);
 
     this.reset = this.reset.bind(this);
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+    this.handleClose = this.handleClose.bind(this);
 
   };
 
   componentDidMount() {
+    this.updateWindowDimensions();
+    window.addEventListener('resize', this.updateWindowDimensions);
+
+    if(!window.web3) {
+      this.setState({currentScreen: 'metamaskRequired'});
+      return;
+    }
+
     var that = this
 
     this.setState({constData: Config.paymentIntervalData});
     this.setState({constAbi: Config.paymentIntervalAbi});
 
     window.web3.eth.getAccounts(function (error, accounts) {
-      if (error) return console.error(error)
-      that.setState({accounts})
+      if(error) return that.setState({error:error.toString(), loading: false});
+      that.setState({accounts});
     })
-
-    this.updateWindowDimensions();
-    window.addEventListener('resize', this.updateWindowDimensions);
   };
 
   componentWillUnmount() {
@@ -173,7 +200,7 @@ class App extends Component {
       bitDiemError: false,
       ensName: '',
       ensNameError: false,
-      errored: false,
+      error: null,
 
       depositContract: '',
       depositContractError: false,
@@ -183,44 +210,174 @@ class App extends Component {
       withdrawContract: '',
       withdrawContractError: false,
       withdrawAmount: '',
-      withdrawAmountError: false,})
+      withdrawAmountError: false,
+    });
   };
   handleChange = name => event => {
     this.setState({
       [name]: event.target.value,
     });
   };
-  handleRadio = (event, value) => {
-   this.setState({ value });
-  };
-  handleChecked = name => event => {
-    this.setState({ [name]: event.target.checked });
-  };
 
   submitDepositNavigate() {
-    this.setState({currentScreen: 'fundContract'})
+    this.setState({currentScreen: 'fundContract', error: null, loading: false});
+  };
+
+  submitUpdatePayerNavigate() {
+    this.setState({currentScreen: 'updateContractPayer', error: null, loading: false});
+  };
+
+  submitUpdatePayeeNavigate() {
+    this.setState({currentScreen: 'updateContractPayee', error: null, loading: false});
   };
 
   submitWithdrawNavigate() {
-    this.setState({currentScreen: 'withdrawContract'})
+    this.setState({currentScreen: 'withdrawContract', error: null, loading: false});
   };
 
   submitCreateNavigate() {
-    this.setState({currentScreen: 'setupContract'})
+    this.setState({currentScreen: 'setupContract', error: null, loading: false});
   };
 
   submitSearchNavigate() {
-    this.setState({currentScreen: 'searchContract'})
+    this.setState({currentScreen: 'searchContract', error: null, loading: false});
+  };
+
+  submitApprovalsNavigate() {
+    this.setState({currentScreen: 'pendingApprovals', error: null, loading: false});
+  };
+
+  submitUpdatePayee() {
+    this.setState({
+      loading:true,
+      newPayeeAddressError: false,
+      error: null
+    });
+    var error = false;
+    if (!isEthereumAddress(this.state.newPayeeAddress)) {
+      this.setState({ newPayeeAddressvError: true });
+      error = true;
+    }
+
+    if (error) {
+      this.setState({loading: false});
+    } else {
+      if(this.state.accounts[0] == this.state.payeeAddress) {
+        this.processUpdatePayee();
+      } else {
+        this.processUpdatePayeeRequest();
+      }
+    }
+  };
+
+  processUpdatePayee() {
+    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.searchContract);
+    var that = this;
+
+    myContract.setPayeeAddress(this.state.newPayeeAddress, {
+      from: this.state.accounts[0],
+      gas: '4700000'
+    }, function(error, result) {
+      if(error) return that.setState({error:error.toString(), loading: false});
+
+      console.log(result)
+      that.setState({loading:false, loaded:true});
+    })
+  };
+
+  processUpdatePayeeRequest() {
+    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.searchContract);
+    var that = this;
+
+    myContract.requestPayeeUpdate(this.state.newPayeeAddress, {
+      from: this.state.accounts[0],
+      gas: '4700000'
+    }, function(error, result) {
+      if(error) return that.setState({error:error.toString(), loading: false});
+
+      console.log(result)
+      that.setState({loading:false, loaded:true});
+    })
+  };
+
+  submitUpdatePayer() {
+    this.setState({
+      loading:true,
+      newPayerAddressError: false,
+      error: null
+    });
+    var error = false;
+    if (!isEthereumAddress(this.state.newPayerAddress)) {
+      this.setState({ newPayerAddressError: true });
+      error = true;
+    }
+
+    if (error) {
+      this.setState({loading: false});
+    } else {
+      if(this.state.accounts[0] == this.state.payerAddress) {
+        this.processUpdatePayer();
+      } else {
+        this.processUpdatePayerRequest();
+      }
+    }
+  };
+
+  processUpdatePayer() {
+    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.searchContract);
+    var that = this;
+
+    myContract.setPayerAddress(this.state.newPayerAddress, {
+      from: this.state.accounts[0],
+      gas: '4700000'
+    }, function(error, result) {
+      if(error) return that.setState({error:error.toString(), loading: false});
+
+      that.setState({loading:false, loaded:true});
+    })
+  };
+
+  processUpdatePayerRequest() {
+    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.searchContract);
+    var that = this;
+
+    myContract.requestPayerUpdate(this.state.newPayerAddress, {
+      from: this.state.accounts[0],
+      gas: '4700000'
+    }, function(error, result) {
+      if(error) return that.setState({error:error.toString(), loading: false});
+
+      that.setState({loading:false, loaded:true});
+    })
   };
 
   submitStartContract() {
-    this.setState({loading: true});
+    this.setState({loading: true, error: null});
     const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.searchContract);
     if(typeof myContract !== 'undefined') {
       var that = this
       myContract.startContract({from: this.state.accounts[0]}, function(error, result){
+        if(error) return that.setState({error:error.toString(), loading: false});
+
         that.setState({loading: false});
 
+        console.log(result);
+        that.processSearchContract();
+      });
+    }
+  };
+
+  submitTerminateContract() {
+    this.setState({loading: true, error: null});
+    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.searchContract);
+    if(typeof myContract !== 'undefined') {
+      var that = this
+      myContract.terminateContract({from: this.state.accounts[0]}, function(error, result){
+        if(error) return that.setState({error:error.toString(), loading: false});
+
+        that.setState({loading: false});
+
+        console.log(result);
         that.processSearchContract();
       });
     }
@@ -229,8 +386,9 @@ class App extends Component {
   submitSearchContract() {
     this.setState({
       loading:true,
-      searchContractError: false
-    })
+      searchContractError: false,
+      error: null
+    });
     var error = false;
     if (!isEthereumAddress(this.state.searchContract)) {
       this.setState({ searchContractError: true });
@@ -238,30 +396,31 @@ class App extends Component {
     }
 
     if (error) {
-      this.setState({loading: false})
+      this.setState({loading: false});
     } else {
-      this.processSearchContract()
+      this.processSearchContract();
     }
   };
+
   processSearchContract() {
     const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.searchContract);
     if(typeof myContract !== 'undefined') {
-      var that = this
-      myContract.getPayeeAddress({from: this.state.searchContract}, function(error, result){
-        that.setState({payeeAddress: result});
+      var that = this;
+      myContract.getContractDetails({from: this.state.accounts[0]}, function(error, result){
+        if(!error) {
+          that.setState({payerAddress: result[0], payeeAddress: result[1], usufructAddress: result[2]});
+        }
+        console.log(result)
       });
-      myContract.getPayerAddress({from: this.state.searchContract}, function(error, result){
-        that.setState({payerAddress: result});
-      });
-      myContract.getPayeeBalance({from: this.state.searchContract}, function(error, result){
+      myContract.getPayeeBalance({from: this.state.accounts[0]}, function(error, result){
         if(!error)
           that.setState({fundsWithdrawable: result.c[0]});
       });
-      myContract.getPayerBalance({from: this.state.searchContract}, function(error, result){
+      myContract.getPayerBalance({from: this.state.accounts[0]}, function(error, result){
         if(!error)
           that.setState({fundsDeposited: result.c[0]});
       });
-      myContract.getContractState({from: this.state.searchContract}, function(error, result){
+      myContract.getContractState({from: this.state.accounts[0]}, function(error, result){
         if(!error) {
           var state = 'Created'
           switch (result.c[0]) {
@@ -278,16 +437,38 @@ class App extends Component {
           that.setState({contractState: state});
         }
       });
+      myContract.getPendingPayeeUpdate({from: this.state.accounts[0]}, function(error, result){
+        if(!error) {
+          var payeeObject = { payerApproved: result[0], payeeApproved: result[1], toAddress: result[2] };
+          that.setState({pendingPayeeUpdate: payeeObject});
+        }
+        console.log(result)
+      });
+      /*myContract.getPendingPayerUpdate({from: this.state.accounts[0]}, function(error, result){
+        if(!error) {
+          var payerObject = { payerApproved: result[0], payeeApproved: result[1], toAddress: result[2] };
+          that.setState({pendingPayerUpdate: payerObject});
+        }
+        console.log(result)
+      });
+      myContract.getPendingUsufructUpdate({from: this.state.accounts[0]}, function(error, result){
+        if(!error) {
+          var usufructObject = { payerApproved: result[0], payeeApproved: result[1], toAddress: result[2] };
+          that.setState({pendingUsufructUpdate: usufructObject});
+        }
+        console.log(result)
+      });*/
 
-      this.setState({paymentintervalcontractContract: myContract, currentScreen: 'viewContract', loading: false, withdrawContract: this.state.searchContract, depositContract: this.state.searchContract})
+      this.setState({paymentintervalcontractContract: myContract, currentScreen: 'viewContract', loading: false, withdrawContract: this.state.searchContract, depositContract: this.state.searchContract});
     }
   };
   submitWithdrawContract() {
     this.setState({
       loading:true,
       withdrawContractError: false,
-      withdrawAmountError: false
-    })
+      withdrawAmountError: false,
+      error: null
+    });
     var error = false;
     if (this.state.withdrawContract=='') {
       this.setState({ withdrawContractError: true });
@@ -314,8 +495,10 @@ class App extends Component {
     myContract.withdrawPayment(_amount, {
       to: this.state.withdrawContract,
       from: this.state.accounts[0],
-      gas: 3000000
+      gas: '4700000'
     }, function(error, result) {
+      if(error) return that.setState({error:error.toString(), loading: false});
+
       that.setState({withdrawContractHash: result, loading:false, loaded:true})
     })
   };
@@ -324,7 +507,8 @@ class App extends Component {
     this.setState({
       loading:true,
       depositContractError: false,
-      depositAmountError:false
+      depositAmountError:false,
+      error: null
     })
     var error = false;
     if (this.state.depositContract=='') {
@@ -352,15 +536,18 @@ class App extends Component {
       to: this.state.depositContract,
       from: this.state.accounts[0],
       value: _amount,
-      gas: 3000000
+      gas: '4700000'
     }, function(error, result) {
+      if(error) return that.setState({error:error.toString(), loading: false});
+
       that.setState({fundContractHash: result, loading:false, loaded:true})
     })
   };
 
   submitBack() {
     this.setState({
-      currentScreen: 'searchContract'
+      currentScreen: 'searchContract',
+      error: null
     })
   };
   submitSetupContract() {
@@ -372,6 +559,7 @@ class App extends Component {
       paymentIntervalError: false,
       bitDiemError:false,
       ensNameError:false,
+      error: null
     })
     var error = false;
     if (!isEthereumAddress(this.state.payer)) {
@@ -405,7 +593,7 @@ class App extends Component {
     }
   };
   async processSetupContract() {
-    this.setState({loading:true})
+    this.setState({loading:true, error: null})
     let code = this.state.constData;
     let abi = this.state.constAbi
 
@@ -415,11 +603,16 @@ class App extends Component {
     let contract = paymentintervalcontractContract.new(
       this.state.payer,
       this.state.payee,
-      this.state.paymentAmount,
       this.state.paymentInterval,
-      {from: this.state.accounts[0], gas: 4700000, data: code},
-      function (e, contract){
-        console.log(e, contract);
+      this.state.paymentAmount,
+      {
+        from: this.state.accounts[0],
+        gas: '4700000',
+        data: code
+      },
+      function (error, contract){
+        if(error) return that.setState({error:error.toString(), loading: false});
+
         if (typeof contract !== 'undefined' && typeof contract.address !== 'undefined') {
            console.log('Contract mined! address: ' + contract.address + ' transactionHash: http://testnet.etherscan.io/tx/' + contract.transactionHash);
 
@@ -428,6 +621,44 @@ class App extends Component {
       }
     );
   };
+
+  submitPayeeApprove() {
+    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.searchContract);
+    var that = this;
+
+    myContract.requestPayeeUpdate(this.state.pendingPayeeUpdate.toAddress, {
+      from: this.state.accounts[0],
+      gas: '4700000'
+    }, function(error, result) {
+      if(error) return that.setState({error:error.toString(), loading: false});
+
+      that.setState({loading:false, loaded:true})
+    })
+  };
+
+  submitPayeeReject() {
+      //implement reject function on the contract
+  };
+
+  submitPayerApprove() {
+    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.searchContract);
+    var that = this;
+
+    myContract.requestPayerUpdate(this.state.pendingPayerUpdate.toAddress, {
+      from: this.state.accounts[0],
+      gas: '4700000'
+    }, function(error, result) {
+      if(error) return that.setState({error:error.toString(), loading: false});
+
+      that.setState({loading:false, loaded:true})
+    })
+  };
+
+  submitPayerReject() {
+      //implement reject function on the contract
+  };
+
+
   handleBottomNavValueChange = (event, bottomNavValue) => {
     var currentScreen = 'searchContract'
     switch(bottomNavValue) {
@@ -444,44 +675,95 @@ class App extends Component {
     this.setState({ bottomNavValue, currentScreen });
   };
 
-  renderSetupContract(style) {
-    return (<SetupContract
-        submitBack={this.submitBack}
-        submitSetupContract={this.submitSetupContract}
-        reset={this.reset}
-        handleChange={this.handleChange}
-        contract={this.state.contract}
-        payer={this.state.payer}
-        payerError={this.state.payerError}
-        payee={this.state.payee}
-        payeeError={this.state.payeeError}
-        paymentInterval={this.state.paymentInterval}
-        paymentIntervalError={this.state.paymentIntervalError}
-        paymentAmount={this.state.paymentAmount}
-        paymentAmountError={this.state.paymentAmountError}
-        loaded={this.state.loaded}
-        loading={this.state.loading}
-        errored={this.state.errored}
-        err={this.state.err}
-        />)
+  renderMetamaskRequired() {
+    return (<MetamaskRequired />);
   };
 
-  renderFundContract(style) {
+  renderPendingApprovals() {
+    return (<PendingApprovals
+      submitBack={this.submitBack}
+      submitPayeeApprove={this.submitPayeeApprove}
+      submitePayeeReject={this.submitPayeeReject}
+      submitPayerApprove={this.submitPayerApprove}
+      submitPayerReject={this.submitPayerReject}
+      contractAddress={this.state.searchContract}
+      pendingPayeeUpdate={this.state.pendingPayeeUpdate}
+      reset={this.reset}
+      handleChange={this.handleChange}
+      loaded={this.state.loaded}
+      loading={this.state.loading}
+      error={this.state.error}
+      />);
+  };
+
+  renderUpdateContractPayer() {
+    return (<UpdateContractPayer
+      submitBack={this.submitBack}
+      submitUpdatePayer={this.submitUpdatePayer}
+      payerAddress={this.state.payerAddress}
+      payerAddressError={this.payerAddressError}
+      newPayerAddress={this.state.newPayerAddress}
+      newPayerAddressError={this.newPayerAddressError}
+      reset={this.reset}
+      handleChange={this.handleChange}
+      loaded={this.state.loaded}
+      loading={this.state.loading}
+      error={this.state.error}
+      />);
+  };
+
+  renderUpdateContractPayee() {
+    return (<UpdateContractPayee
+      submitBack={this.submitBack}
+      submitUpdatePayee={this.submitUpdatePayee}
+      payeeAddress={this.state.payeeAddress}
+      payeeAddressError={this.payeeAddressError}
+      newPayeeAddress={this.state.newPayeeAddress}
+      newPayeeAddressError={this.newPayeeAddressError}
+      reset={this.reset}
+      handleChange={this.handleChange}
+      loaded={this.state.loaded}
+      loading={this.state.loading}
+      error={this.state.error}
+      />);
+  };
+
+  renderSetupContract() {
+    return (<SetupContract
+      submitBack={this.submitBack}
+      submitSetupContract={this.submitSetupContract}
+      reset={this.reset}
+      handleChange={this.handleChange}
+      contract={this.state.contract}
+      payer={this.state.payer}
+      payerError={this.state.payerError}
+      payee={this.state.payee}
+      payeeError={this.state.payeeError}
+      paymentInterval={this.state.paymentInterval}
+      paymentIntervalError={this.state.paymentIntervalError}
+      paymentAmount={this.state.paymentAmount}
+      paymentAmountError={this.state.paymentAmountError}
+      loaded={this.state.loaded}
+      loading={this.state.loading}
+      error={this.state.error}
+      />);
+  };
+
+  renderFundContract() {
     return (<DepositContract
-        submitBack={this.submitBack}
-        submitFundContract={this.submitFundContract}
-        reset={this.reset}
-        handleChange={this.handleChange}
-        depositContract={this.state.depositContract}
-        depositContractError={this.state.depositContractError}
-        fundContractHash={this.state.fundContractHash}
-        depositAmount={this.state.depositAmount}
-        depositAmountError={this.state.depositAmountError}
-        loaded={this.state.loaded}
-        loading={this.state.loading}
-        errored={this.state.errored}
-        err={this.state.err}
-        />)
+      submitBack={this.submitBack}
+      submitFundContract={this.submitFundContract}
+      reset={this.reset}
+      handleChange={this.handleChange}
+      depositContract={this.state.depositContract}
+      depositContractError={this.state.depositContractError}
+      fundContractHash={this.state.fundContractHash}
+      depositAmount={this.state.depositAmount}
+      depositAmountError={this.state.depositAmountError}
+      loaded={this.state.loaded}
+      loading={this.state.loading}
+      error={this.state.error}
+      />);
   };
 
   renderSearchContract() {
@@ -497,9 +779,8 @@ class App extends Component {
       contract={this.state.contract}
       withdrawContract={this.state.withdrawContract}
       withdrawAmount={this.state.withdrawAmount}
-      errored={this.state.errored}
-      err={this.state.err}
-      />)
+      error={this.state.error}
+      />);
   };
 
   renderViewContract() {
@@ -507,37 +788,45 @@ class App extends Component {
       submitBack={this.submitBack}
       submitDepositNavigate={this.submitDepositNavigate}
       submitWithdrawNavigate={this.submitWithdrawNavigate}
+      submitUpdatePayerNavigate={this.submitUpdatePayerNavigate}
+      submitUpdatePayeeNavigate={this.submitUpdatePayeeNavigate}
+      submitApprovalsNavigate={this.submitApprovalsNavigate}
       submitStartContract={this.submitStartContract}
+      submitTerminateContract={this.submitTerminateContract}
       reset={this.reset}
       handleChange={this.handleChange}
       contractState={this.state.contractState}
+      contractAddress={this.state.searchContract}
       fundsDeposited={this.state.fundsDeposited}
       fundsWithdrawable={this.state.fundsWithdrawable}
       payerAddress={this.state.payerAddress}
       payeeAddress={this.state.payeeAddress}
+      pendingPayeeUpdate={this.state.pendingPayeeUpdate}
       loaded={this.state.loaded}
       loading={this.state.loading}
-      errored={this.state.errored}
-      err={this.state.err}
-      />)
+      error={this.state.error}
+      />);
   };
 
-  renderWithdrawContract(style) {
+  renderWithdrawContract() {
     return (<WithdrawContract
-        submitBack={this.submitBack}
-        submitWithdrawContract={this.submitWithdrawContract}
-        reset={this.reset}
-        handleChange={this.handleChange}
-        fundsWithdrawable={this.state.fundsWithdrawable}
-        withdrawContract={this.state.withdrawContract}
-        withdrawContractError={this.state.withdrawContractError}
-        withdrawAmount={this.state.withdrawAmount}
-        withdrawAmountError={this.state.withdrawAmountError}
-        loaded={this.state.loaded}
-        loading={this.state.loading}
-        errored={this.state.errored}
-        err={this.state.err}
-        />)
+      submitBack={this.submitBack}
+      submitWithdrawContract={this.submitWithdrawContract}
+      reset={this.reset}
+      handleChange={this.handleChange}
+      fundsWithdrawable={this.state.fundsWithdrawable}
+      withdrawContract={this.state.withdrawContract}
+      withdrawContractError={this.state.withdrawContractError}
+      withdrawAmount={this.state.withdrawAmount}
+      withdrawAmountError={this.state.withdrawAmountError}
+      loaded={this.state.loaded}
+      loading={this.state.loading}
+      error={this.state.error}
+      />);
+  };
+
+  handleClose() {
+    this.setState({error: null})
   };
 
   render() {
@@ -604,6 +893,8 @@ class App extends Component {
             <BottomNavigationAction label="Create" value="create" icon={<CreateIcon />} />
             <BottomNavigationAction label="My Contracts" value="myContracts" icon={<MyContractsIcon />} />
           </BottomNavigation>
+
+          <ErrorModal error={this.state.error} open={this.state.error != null} handleClose={this.handleClose} />
         </MuiThemeProvider>
       )
     } else {
@@ -634,14 +925,14 @@ class App extends Component {
             <CssBaseline />
             <Grid container xs={12} justify="space-around" alignItems="center" direction="row" spacing={0}>
               <Grid container xs={11} justify="space-around" direction="row" spacing={0}>
-                <Grid item xs={false} sm={2} md={3} lg={4} style={{marginTop: '120px'}}>
+                <Grid item xs={false} sm={2} md={3} lg={3} style={{marginTop: '120px'}}>
                 </Grid>
-                <Grid item xs={12} sm={8} md={6} lg={4} style={{marginTop: '120px'}}>
+                <Grid item xs={12} sm={8} md={6} lg={6} style={{marginTop: '120px'}}>
                   <Card raised elevation={5} square={false}  >
                     {this.renderScreen()}
                   </Card>
                 </Grid>
-                <Grid item xs={false} sm={2} md={3} lg={4} style={{position: 'relative'}}>
+                <Grid item xs={false} sm={2} md={3} lg={3} style={{position: 'relative'}}>
                   <Tooltip title={tooltip}>
                     <Button variant="fab" color='secondary' style={{position: 'absolute', top:'157px', left: '20px'}} onClick={onClick}>
                       {fabIcon}
@@ -651,6 +942,8 @@ class App extends Component {
               </Grid>
             </Grid>
           </div>
+
+          <ErrorModal error={this.state.error} open={this.state.error != null} handleClose={this.handleClose}/>
         </MuiThemeProvider>
       );
     }
@@ -658,22 +951,34 @@ class App extends Component {
   renderScreen() {
     switch (this.state.currentScreen) {
       case 'searchContract':
-        return this.renderSearchContract()
+        return this.renderSearchContract();
         break;
       case 'setupContract':
-        return this.renderSetupContract()
+        return this.renderSetupContract();
         break;
       case 'fundContract':
-        return this.renderFundContract()
+        return this.renderFundContract();
         break;
       case 'withdrawContract':
-        return this.renderWithdrawContract()
+        return this.renderWithdrawContract();
         break;
       case 'viewContract':
-        return this.renderViewContract()
+        return this.renderViewContract();
+        break;
+      case 'metamaskRequired':
+        return this.renderMetamaskRequired();
+        break;
+      case 'updateContractPayer':
+        return this.renderUpdateContractPayer();
+        break;
+      case 'updateContractPayee':
+        return this.renderUpdateContractPayee();
+        break;
+      case 'pendingApprovals':
+        return this.renderPendingApprovals();
         break;
       default:
-        return this.renderSearchContract()
+        return this.renderSearchContract();
     }
   }
 }

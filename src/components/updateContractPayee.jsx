@@ -11,7 +11,7 @@ import { CircularProgress } from 'material-ui/Progress';
 
 const styles = {};
 
-class WithdrawContract extends Component {
+class ChangeContractPayee extends Component {
 
   constructor(props) {
     super(props);
@@ -24,13 +24,13 @@ class WithdrawContract extends Component {
       return(<CardContent>
         <Grid container xs={12} direction="row" justify="center">
           <Grid item xs={12}>
-            <Typography align='center' color="textSecondary" variant="headline" component="h2">Withdrawal is complete!</Typography>
+            <Typography align='center' color="textSecondary" variant="headline" component="h2">Contract change has been requested!</Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography align='center' color="textSecondary" component="h2"><b>{this.props.withdrawAmount}</b> has been withdrawn to: <b>{this.props.withdrawContract}</b>.</Typography>
+            <Typography align='center' color="textSecondary" component="h2"><b>{this.props.payeeAddress}</b> has been updated to: <b>{this.props.newPayeeAddress}</b>.</Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography align='center' color="textSecondary" component="h2">Once it has been mined it should reflect on your account.</Typography>
+            <Typography align='center' color="textSecondary" component="h2">Once it has been mined it should reflect on your contract.</Typography>
           </Grid>
         </Grid>
         <Grid container xs={12} direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
@@ -47,22 +47,16 @@ class WithdrawContract extends Component {
             <Grid container xs={12} alignItems="flex-start" spacing={0}>
               <Grid item xs={12}>
                 <Grid container xs={12} direction="column" justify="center">
-                  <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Withdraw Contract</Typography></Grid>
+                  <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Update Payee</Typography></Grid>
                   <Grid item xs={12}><Typography align='center'>{"For more information, head over to https://www.bitdiem.com/"}</Typography></Grid>
                   <Grid item xs={12}>
-                    <Typography component="h2">Available: {this.props.fundsWithdrawable}</Typography>
+                    <Typography component="h2">Current Payee Address: {this.props.payeeAddress}</Typography>
                   </Grid>
                   <Grid item xs={12} >
-                    <TextField required fullWidth={true} color="textSecondary" required error={this.props.withdrawContractError} disabled={this.props.loading}
-                      id="withdrawContract" label="ENS Name" value={this.props.withdrawContract}
-                      onChange={this.props.handleChange('withdrawContract')} margin="normal"
-                      helperText={"The contract name"}/>
-                  </Grid>
-                  <Grid item xs={12} >
-                    <TextField required fullWidth={true} color="textSecondary" required error={this.props.withdrawAmountError} disabled={this.props.loading}
-                      id="withdrawAmount" label="Amount" value={this.props.withdrawAmount}
-                      onChange={this.props.handleChange('withdrawAmount')} margin="normal"
-                      helperText={"Withdraw amount"}/>
+                    <TextField required fullWidth={true} color="textSecondary" required error={this.props.newPayeeAddressError} disabled={this.props.loading}
+                      id="newPayeeAddress" label="Payee Address" value={this.props.newPayeeAddress}
+                      onChange={this.props.handleChange('newPayeeAddress')} margin="normal"
+                      helperText={"Address of the payee you want to set"}/>
                   </Grid>
                 </Grid>
               </Grid>
@@ -76,8 +70,8 @@ class WithdrawContract extends Component {
               {this.props.loading && <CircularProgress size={36} style={{position: 'absolute',top: '50%',left: '50%',marginTop: -12,marginLeft: -12,}}/>}
             </Grid>
             <Grid item xs={6} sm={6} align='right'>
-              <Button size="medium" variant="raised" color="secondary" disabled={this.props.loading} onClick={this.props.submitWithdrawContract}>
-                Withdraw
+              <Button size="medium" variant="raised" color="secondary" disabled={this.props.loading} onClick={this.props.submitUpdatePayee}>
+                Update
               </Button>
               {this.props.loading && <CircularProgress size={36} style={{position: 'absolute',top: '50%',left: '50%',marginTop: -12,marginLeft: -12,}}/>}
             </Grid>
@@ -90,4 +84,4 @@ class WithdrawContract extends Component {
   }
 }
 
-export default withStyles(styles)(WithdrawContract);
+export default withStyles(styles)(ChangeContractPayee);
