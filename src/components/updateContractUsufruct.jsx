@@ -11,7 +11,7 @@ import { CircularProgress } from 'material-ui/Progress';
 
 const styles = {};
 
-class ChangeContractPayee extends Component {
+class ChangeContractUsufruct extends Component {
 
   constructor(props) {
     super(props);
@@ -21,14 +21,14 @@ class ChangeContractPayee extends Component {
   render() {
 
     if(this.props.loaded) {
-      var address = 'https://rinkeby.etherscan.io/tx/'+this.props.updatePayeeHash
+      var address = 'https://rinkeby.etherscan.io/tx/'+this.props.updateUsufructHash
       return(<CardContent>
         <Grid container xs={12} direction="row" justify="center">
           <Grid item xs={12}>
             <Typography align='center' color="textSecondary" variant="headline" component="h2">Contract change has been requested!</Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography align='center' color="textSecondary" component="h2"><b>{this.props.contract.payeeAddress}</b> has been updated to: <b>{this.props.newPayeeAddress}</b>.</Typography>
+            <Typography align='center' color="textSecondary" component="h2"><b>{this.props.contract.usufructAddress}</b> has been updated to: <b>{this.props.newUsufructAddress}</b>.</Typography>
           </Grid>
           <Grid item xs={12}>
             <Typography align='center' color="textSecondary" component="h2">Once it has been mined it should reflect on your contract.</Typography>
@@ -51,15 +51,16 @@ class ChangeContractPayee extends Component {
             <Grid container xs={12} alignItems="flex-start" spacing={0}>
               <Grid item xs={12}>
                 <Grid container xs={12} direction="column" justify="center">
-                  <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Update Payee</Typography></Grid>
+                  <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Update Usufruct</Typography></Grid>
+                  <Grid item xs={12}><Typography align='center'>{"For more information, head over to https://www.bitdiem.com/"}</Typography></Grid>
                   <Grid item xs={12}>
-                    <Typography component="h2">Current Payee Address: {this.props.contract.payeeAddress}</Typography>
+                    <Typography component="h2">Current Usufruct Address: {this.props.contract.usufructAddress}</Typography>
                   </Grid>
                   <Grid item xs={12} >
-                    <TextField required fullWidth={true} color="textSecondary" required error={this.props.newPayeeAddressError} disabled={this.props.loading}
-                      id="newPayeeAddress" label="Payee Address" value={this.props.newPayeeAddress}
-                      onChange={this.props.handleChange('newPayeeAddress')} margin="normal"
-                      helperText={"Address of the payee you want to set"}/>
+                    <TextField required fullWidth={true} color="textSecondary" required error={this.props.newUsufructAddressError} disabled={this.props.loading}
+                      id="newUsufructAddress" label="Usufruct Address" value={this.props.newUsufructAddress}
+                      onChange={this.props.handleChange('newUsufructAddress')} margin="normal"
+                      helperText={"Address of the usufruct you want to set"}/>
                   </Grid>
                 </Grid>
               </Grid>
@@ -73,7 +74,7 @@ class ChangeContractPayee extends Component {
               {this.props.loading && <CircularProgress size={36} style={{position: 'absolute',top: '50%',left: '50%',marginTop: -12,marginLeft: -12,}}/>}
             </Grid>
             <Grid item xs={6} sm={6} align='right'>
-              <Button size="small" variant="raised" color="secondary" disabled={this.props.loading} onClick={this.props.submitUpdatePayee}>
+              <Button size="small" variant="raised" color="secondary" disabled={this.props.loading} onClick={this.props.submitUpdateUsufruct}>
                 Update
               </Button>
               {this.props.loading && <CircularProgress size={36} style={{position: 'absolute',top: '50%',left: '50%',marginTop: -12,marginLeft: -12,}}/>}
@@ -87,4 +88,4 @@ class ChangeContractPayee extends Component {
   }
 }
 
-export default withStyles(styles)(ChangeContractPayee);
+export default withStyles(styles)(ChangeContractUsufruct);

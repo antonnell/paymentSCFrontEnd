@@ -11,7 +11,7 @@ import { CircularProgress } from 'material-ui/Progress';
 
 const styles = {};
 
-class MetamaskRequired extends Component {
+class MetamaskLoginRequired extends Component {
 
   constructor(props) {
     super(props);
@@ -26,9 +26,9 @@ class MetamaskRequired extends Component {
             <Grid item xs={12}>
               <Grid container xs={12} direction="column" justify="center">
                 <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>BitDiem Metamask</Typography></Grid>
-                <Grid item xs={12}><Typography align='center'>We could not find MetaMask on your system. Unfortunately you require metamask to continue using the <b>BitDiem</b> network.</Typography></Grid>
-                <Grid item xs={12}><Typography align='center'>For instructions on how to set up your <b>MetaMask extension</b>, please head to href <a href="https://metamask.io/">https://metamask.io/</a></Typography></Grid>
-                <Grid item xs={12}><Typography align='center'>Once you have finished setting up metamsk, please <b>refresh</b> this page.</Typography></Grid>
+                <Grid item xs={12}><Typography align='center'>Please log in to your <b>MetaMask extension</b>.</Typography></Grid>
+                <Grid item xs={12}><Typography align='center'> If you require more information on MetaMask , please head to href <a href="https://metamask.io/">https://metamask.io/</a></Typography></Grid>
+                <Grid item xs={12}><Typography align='center'>Once you have logged in to metamsk, please <b>refresh</b> this page.</Typography></Grid>
                 <Grid item xs={12} style={{marginTop:10,marginBottom:10}}></Grid>
                 <Grid item xs={12}>
                   <Typography component="h2"></Typography>
@@ -48,4 +48,4 @@ class MetamaskRequired extends Component {
   }
 }
 
-export default withStyles(styles)(MetamaskRequired);
+export default withStyles(styles)(MetamaskLoginRequired);

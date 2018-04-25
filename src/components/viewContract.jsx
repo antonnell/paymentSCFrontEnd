@@ -46,14 +46,16 @@ class SearchContract extends Component {
 
   render() {
 
-    var startTerminated = (<Button size="medium" variant="flat" color="secondary" disabled={this.props.loading||this.props.contractState!='Created'} onClick={this.props.submitStartContract}>
-          Start
-        </Button>)
+    var startTerminated = (
+      <ListItem button onClick={this.props.submitStartContract}>
+        <ListItemText primary="Start Contract" />
+      </ListItem>)
 
-    if(this.props.contractState=='In Progress') {
-      startTerminated = (<Button size="medium" variant="flat" color="secondary" disabled={this.props.loading||this.props.contractState!='In Progress'} onClick={this.props.submitTerminateContract}>
-            Terminate
-          </Button>)
+    if(this.props.contract.contractState=='In Progress') {
+      startTerminated = (
+        <ListItem button onClick={this.props.submitTerminateContract}>
+          <ListItemText primary="Terminate Contract" />
+        </ListItem>)
     }
 
     var infoStyle = {
@@ -63,13 +65,13 @@ class SearchContract extends Component {
     }
 
     var pendingApprovals = 0;
-    if(this.props.pendingPayeeUpdate != null && (this.props.pendingPayeeUpdate.payeeApproved != true || this.props.pendingPayeeUpdate.payerApproved != true)) {
+    if(this.props.contract.pendingPayeeUpdate != null && this.props.contract.pendingPayeeUpdate.toAddress != '0x0000000000000000000000000000000000000000' && (this.props.contract.pendingPayeeUpdate.payeeApproved != true || this.props.contract.pendingPayeeUpdate.payerApproved != true)) {
       pendingApprovals++;
     }
-    if(this.props.pendingPayerUpdate != null && (this.props.pendingPayerUpdate.payeeApproved != true || this.props.pendingPayerUpdate.payerApproved != true)) {
+    if(this.props.contract.pendingPayerUpdate != null && this.props.contract.pendingPayerUpdate.toAddress != '0x0000000000000000000000000000000000000000' && (this.props.contract.pendingPayerUpdate.payeeApproved != true || this.props.contract.pendingPayerUpdate.payerApproved != true)) {
       pendingApprovals++;
     }
-    if(this.props.pendingUsufructUpdate != null && (this.props.pendingUsufructUpdate.payeeApproved != true || this.props.pendingUsufructUpdate.payerApproved != true)) {
+    if(this.props.contract.pendingUsufructUpdate != null && this.props.contract.pendingUsufructUpdate.toAddress != '0x0000000000000000000000000000000000000000' && (this.props.contract.pendingUsufructUpdate.payeeApproved != true || this.props.contract.pendingUsufructUpdate.payerApproved != true)) {
       pendingApprovals++;
     }
 
@@ -79,44 +81,51 @@ class SearchContract extends Component {
           <Grid container xs={12} alignItems="flex-start" spacing={0}>
             <Grid item xs={12}>
               <Grid container xs={12} direction="row" justify="center">
-                <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Contract Information</Typography></Grid>
-                <Grid item xs={12}><Typography align='center'>{"For more information, head over to https://www.bitdiem.com/"}</Typography></Grid>
+                <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Your Contract Information</Typography></Grid>
                 <Grid item xs={12} style={{marginTop:10,marginBottom:10}}></Grid>
                 <Grid item xs={12} sm={4}>
                   <Typography component="h2"><b>Contract Address:</b></Typography>
                 </Grid>
                 <Grid item xs={12} sm={8}>
-                  <Typography component="h2" style={infoStyle}>{this.props.contractAddress}</Typography>
+                  <Typography component="h2" style={infoStyle}>{this.props.contract.contractAddress}</Typography>
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <Typography component="h2"><b>Contract State:</b></Typography>
                 </Grid>
                 <Grid item xs={12} sm={8}>
-                  <Typography component="h2" style={infoStyle}>{this.props.contractState}</Typography>
+                  <Typography component="h2" style={infoStyle}>{this.props.contract.contractState}</Typography>
                 </Grid>
+                <Grid item xs={12} style={{marginTop:10}}></Grid>
                 <Grid item xs={12} sm={4}>
                   <Typography component="h2"><b>Funds Deposited:</b></Typography>
                 </Grid>
                 <Grid item xs={12} sm={8}>
-                  <Typography component="h2" style={infoStyle}>{this.props.fundsDeposited}</Typography>
+                  <Typography component="h2" style={infoStyle}>{this.props.contract.fundsDeposited}</Typography>
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <Typography component="h2"><b>Funds Available:</b></Typography>
                 </Grid>
                 <Grid item xs={12} sm={8}>
-                  <Typography component="h2" style={infoStyle}>{this.props.fundsWithdrawable}</Typography>
+                  <Typography component="h2" style={infoStyle}>{this.props.contract.fundsWithdrawable}</Typography>
                 </Grid>
+                <Grid item xs={12} style={{marginTop:10}}></Grid>
                 <Grid item xs={12} sm={4}>
                   <Typography component="h2"><b>Payer Address:</b></Typography>
                 </Grid>
                 <Grid item xs={12} sm={8}>
-                  <Typography component="h2" style={infoStyle}>{this.props.payerAddress}</Typography>
+                  <Typography component="h2" style={infoStyle}>{this.props.contract.payerAddress}</Typography>
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <Typography component="h2"><b>Payee Address:</b></Typography>
                 </Grid>
                 <Grid item xs={12} sm={8}>
-                  <Typography component="h2" style={infoStyle}>{this.props.payeeAddress}</Typography>
+                  <Typography component="h2" style={infoStyle}>{this.props.contract.payeeAddress}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Typography component="h2"><b>Usufruct Address:</b></Typography>
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                  <Typography component="h2" style={infoStyle}>{this.props.contract.usufructAddress}</Typography>
                 </Grid>
                 <Grid item xs={12} style={{marginTop:10,marginBottom:10}}></Grid>
               </Grid>
@@ -125,20 +134,20 @@ class SearchContract extends Component {
         </Grid>
         <Grid container xs={12} direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
           <Grid item xs={2} sm={2} align='left' >
-            <Button size="medium" variant="flat" color="secondary" disabled={this.props.loading} onClick={this.props.submitBack}>
+            <Button style={{verticalAlign: 'middle', marginTop: '8px'}} size="small" variant="flat" color="secondary" disabled={this.props.loading} onClick={this.props.submitBack}>
               Back
             </Button>
           </Grid>
           <Grid item xs={10} sm={10} align='right' spacing={0}>
-            {startTerminated}
-            <Button size="medium" variant="flat" color="secondary" disabled={this.props.loading||this.props.contractState=='Terminated'} onClick={this.props.submitDepositNavigate}>
+            <Button style={{verticalAlign: 'middle'}} size="small" variant="flat" color="secondary" disabled={this.props.loading||this.props.contract.contractState=='Terminated'} onClick={this.props.submitDepositNavigate}>
               Deposit
             </Button>
-            <Button size="medium" variant="flat" color="secondary" disabled={this.props.loading} onClick={this.props.submitWithdrawNavigate}>
+            <Button style={{verticalAlign: 'middle'}} size="small" variant="flat" color="secondary" disabled={this.props.loading} onClick={this.props.submitWithdrawNavigate}>
               Withdraw
             </Button>
             <Badge color="primary" badgeContent={pendingApprovals} >
               <IconButton
+                style={{verticalAlign: 'top'}}
                 color="secondary"
                 aria-label="More"
                 buttonRef={node => {
@@ -164,11 +173,15 @@ class SearchContract extends Component {
               }}
             >
             <List component="nav">
+              {startTerminated}
               <ListItem button onClick={this.props.submitUpdatePayerNavigate}>
                 <ListItemText primary="Update Payer" />
               </ListItem>
               <ListItem button onClick={this.props.submitUpdatePayeeNavigate}>
                 <ListItemText primary="Update Payee" />
+              </ListItem>
+              <ListItem button onClick={this.props.submitUpdateUsufructNavigate}>
+                <ListItemText primary="Update Usufruct" />
               </ListItem>
               <Badge color="primary" badgeContent={pendingApprovals} >
                 <ListItem button onClick={this.props.submitApprovalsNavigate}>

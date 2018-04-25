@@ -25,7 +25,7 @@ class ErrorModal extends Component {
   };
 
   render() {
-    
+
     return (
       <Dialog
         open={this.props.open}
@@ -40,7 +40,7 @@ class ErrorModal extends Component {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={this.props.handleClose} color="primary" autoFocus>
+          <Button onClick={this.props.handleClose} color="secondary" autoFocus>
             OK
           </Button>
         </DialogActions>

@@ -13,6 +13,7 @@ import Icon from 'material-ui/Icon';
 import SvgIcon from 'material-ui/SvgIcon';
 import Popover from 'material-ui/Popover';
 import List, { ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from 'material-ui/List';
+const isEthereumAddress  = require('is-ethereum-address');
 
 const styles = {};
 
@@ -53,11 +54,12 @@ class ApprovalListItem extends Component {
           secondary={this.props.subTitle}
         />
         <ListItemSecondaryAction>
+          {this.props.loading && <CircularProgress size={36} style={{position: 'absolute',top: '40%',left: '40%',marginTop: -12,marginLeft: -12,}}/>}
           <IconButton
+            disabled={this.props.loading}
             aria-label="Options"
             color="secondary"
             buttonRef={node => {
-              console.log(node)
               this.anchorEl = node;
             }}
             onClick={this.handleClickButton}>
@@ -79,10 +81,10 @@ class ApprovalListItem extends Component {
             }}
           >
           <List component="nav">
-            <ListItem button onClick={(event) => { this.submitApprove(this.props.title); }}>
+            <ListItem disabled={this.props.loading} button onClick={(event) => { this.submitApprove(this.props.title); }}>
               <ListItemText primary="Approve" />
             </ListItem>
-            <ListItem button onClick={(event) => { this.submitReject(this.props.title); }}>
+            <ListItem disabled={this.props.loading} button onClick={(event) => { this.submitReject(this.props.title); }}>
               <ListItemText primary="Reject" />
             </ListItem>
           </List>
@@ -124,51 +126,83 @@ class PendingContractApprovals extends Component {
 
     this.renderPendingPayeeUpdate = this.renderPendingPayeeUpdate.bind(this);
     this.renderPendingPayerUpdate = this.renderPendingPayerUpdate.bind(this);
+    this.renderPendingUsufructUpdate = this.renderPendingUsufructUpdate.bind(this);
   };
 
   renderPendingPayeeUpdate() {
-    if(this.props.pendingPayeeUpdate == null) {
-      return (<div></div>)
+    if(this.props.contract.pendingPayeeUpdate == null || this.props.contract.pendingPayeeUpdate.toAddress == '0x' || this.props.contract.pendingPayeeUpdate.toAddress == '0x0000000000000000000000000000000000000000' || (this.props.contract.pendingPayeeUpdate.payeeApproved == true && this.props.contract.pendingPayeeUpdate.payerApproved == true)) {
+      return false
     }
 
-    return (<ApprovalListItem title={'Payee Update'} subTitle={this.props.pendingPayeeUpdate.toAddress} submitApprove={this.props.submitPayeeApprove} submitReject={this.props.submitPayeeReject} />);
+    return (<ApprovalListItem
+      title={'Payee Update'}
+      subTitle={this.props.contract.pendingPayeeUpdate.toAddress}
+      submitApprove={this.props.submitPayeeApprove}
+      submitReject={this.props.submitPayeeReject}
+      loading={this.props.loading}
+      />);
   };
 
   renderPendingPayerUpdate() {
-    if(this.props.pendingPayerUpdate == null) {
-      return (<div></div>)
+    if(this.props.contract.pendingPayerUpdate == null || this.props.contract.pendingPayerUpdate.toAddress == '0x' || this.props.contract.pendingPayerUpdate.toAddress == '0x0000000000000000000000000000000000000000' || (this.props.contract.pendingPayerUpdate.payeeApproved == true && this.props.contract.pendingPayerUpdate.payerApproved == true)) {
+      return false
     }
 
-    return (<ApprovalListItem title={'Payer Update'} subTitle={this.props.pendingPayerUpdate.toAddress} submitApprove={this.props.submitPayerApprove} submitReject={this.props.submitPayerReject} />);
+    return (<ApprovalListItem
+      title={'Payer Update'}
+      subTitle={this.props.contract.pendingPayerUpdate.toAddress}
+      submitApprove={this.props.submitPayerApprove}
+      submitReject={this.props.submitPayerReject}
+      loading={this.props.loading}
+      />);
+  };
+
+  renderPendingUsufructUpdate() {
+    if(this.props.contract.pendingUsufructUpdate == null || this.props.contract.pendingUsufructUpdate.toAddress == '0x' || this.props.contract.pendingUsufructUpdate.toAddress == '0x0000000000000000000000000000000000000000' || (this.props.contract.pendingUsufructUpdate.payeeApproved == true && this.props.contract.pendingUsufructUpdate.payerApproved == true)) {
+      return false
+    }
+
+    return (<ApprovalListItem
+      title={'Usufruct Update'}
+      subTitle={this.props.contract.pendingUsufructUpdate.toAddress}
+      submitApprove={this.props.submitUsufructApprove}
+      submitReject={this.props.submitUsufructReject}
+      loading={this.props.loading}
+      />);
   };
 
   render() {
+
+    var payee = this.renderPendingPayeeUpdate()
+    var payer = this.renderPendingPayerUpdate()
+    var usufruct = this.renderPendingUsufructUpdate()
+    var nothing = <Typography align='center' component="h2">There is nothing to be approved</Typography>
+    var showNothing = false
+
+    if(payee == false && payer == false && usufruct == false) {
+      showNothing = true
+    }
+
     return (
       <CardContent>
         <Grid container xs={12} direction="row" justify="center">
           <Grid container xs={12} alignItems="flex-start" spacing={0}>
             <Grid item xs={12}>
               <Grid container xs={12} direction="row" justify="center">
-                <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Approvals</Typography></Grid>
-                <Grid item xs={12}><Typography align='center'>{"For more information, head over to https://www.bitdiem.com/"}</Typography></Grid>
+                <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Pending approvals</Typography></Grid>
                 <Grid item xs={12} style={{marginTop:10,marginBottom:10}}></Grid>
-                <List>
-                  {this.renderPendingPayeeUpdate()}
-                  {this.renderPendingPayerUpdate()}
-                </List>
-
+                  { ( showNothing? nothing : <List> {payee} {payer} {usufruct} </List> ) }
                 <Grid item xs={12} style={{marginTop:10,marginBottom:10}}></Grid>
               </Grid>
             </Grid>
           </Grid>
         </Grid>
         <Grid container xs={12} direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
-          <Grid item xs={3} sm={3} align='left' >
-            <Button size="medium" variant="flat" color="secondary" disabled={this.props.loading} onClick={this.props.submitBack}>
+          <Grid item xs={12} sm={12} align='left' >
+            <Button size="small" variant="flat" color="secondary" disabled={this.props.loading} onClick={this.props.submitBack}>
               Back
             </Button>
           </Grid>
-          {this.props.loading && <CircularProgress size={36} style={{position: 'absolute',top: '50%',left: '50%',marginTop: -12,marginLeft: -12,}}/>}
         </Grid>
         <Grid container xs={12} direction="row">
           <LinearProgress />

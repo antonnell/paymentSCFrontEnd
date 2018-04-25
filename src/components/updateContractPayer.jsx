@@ -21,21 +21,25 @@ class ChangeContractPayer extends Component {
   render() {
 
     if(this.props.loaded) {
+      var address = 'https://rinkeby.etherscan.io/tx/'+this.props.updatePayerHash
       return(<CardContent>
         <Grid container xs={12} direction="row" justify="center">
           <Grid item xs={12}>
             <Typography align='center' color="textSecondary" variant="headline" component="h2">Contract change has been requested!</Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography align='center' color="textSecondary" component="h2"><b>{this.props.payerAddress}</b> has been updated to: <b>{this.props.newPayerAddress}</b>.</Typography>
+            <Typography align='center' color="textSecondary" component="h2"><b>{this.props.contract.payerAddress}</b> has been updated to: <b>{this.props.newPayerAddress}</b>.</Typography>
           </Grid>
           <Grid item xs={12}>
             <Typography align='center' color="textSecondary" component="h2">Once it has been mined it should reflect on your contract.</Typography>
           </Grid>
+          <Grid item xs={12}>
+            <Typography align='center' color="textSecondary" component="h2">You can view the <b>progress</b> of the transaction at <a href={address}>{address}</a>.</Typography>
+          </Grid>
         </Grid>
         <Grid container xs={12} direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
           <Grid item xs={12} sm={12} align='left'>
-            <Button size="small" onClick={this.props.reset}>Back</Button>
+            <Button size="small" onClick={this.props.submitBack}>Back</Button>
           </Grid>
         </Grid>
       </CardContent>)
@@ -48,9 +52,8 @@ class ChangeContractPayer extends Component {
               <Grid item xs={12}>
                 <Grid container xs={12} direction="column" justify="center">
                   <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Update Payer</Typography></Grid>
-                  <Grid item xs={12}><Typography align='center'>{"For more information, head over to https://www.bitdiem.com/"}</Typography></Grid>
                   <Grid item xs={12}>
-                    <Typography component="h2">Current Payer Address: {this.props.payerAddress}</Typography>
+                    <Typography component="h2">Current Payer Address: {this.props.contract.payerAddress}</Typography>
                   </Grid>
                   <Grid item xs={12} >
                     <TextField required fullWidth={true} color="textSecondary" required error={this.props.newPayerAddressError} disabled={this.props.loading}
@@ -64,13 +67,13 @@ class ChangeContractPayer extends Component {
           </Grid>
           <Grid container xs={12} direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
             <Grid item xs={6} sm={6} align='left' >
-              <Button size="medium" variant="flat" color="secondary" disabled={this.props.loading} onClick={this.props.submitBack}>
+              <Button size="small" variant="flat" color="secondary" disabled={this.props.loading} onClick={this.props.submitBack}>
                 Back
               </Button>
               {this.props.loading && <CircularProgress size={36} style={{position: 'absolute',top: '50%',left: '50%',marginTop: -12,marginLeft: -12,}}/>}
             </Grid>
             <Grid item xs={6} sm={6} align='right'>
-              <Button size="medium" variant="raised" color="secondary" disabled={this.props.loading} onClick={this.props.submitUpdatePayer}>
+              <Button size="small" variant="raised" color="secondary" disabled={this.props.loading} onClick={this.props.submitUpdatePayer}>
                 Update
               </Button>
               {this.props.loading && <CircularProgress size={36} style={{position: 'absolute',top: '50%',left: '50%',marginTop: -12,marginLeft: -12,}}/>}
