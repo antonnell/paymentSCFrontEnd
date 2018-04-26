@@ -25,7 +25,7 @@ class ChangeContractUsufruct extends Component {
       return(<CardContent>
         <Grid container xs={12} direction="row" justify="center">
           <Grid item xs={12}>
-            <Typography align='center' color="textSecondary" variant="headline" component="h2">Contract change has been requested!</Typography>
+            <Typography align='center' color="textSecondary" variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Contract change has been requested!</Typography>
           </Grid>
           <Grid item xs={12}>
             <Typography align='center' color="textSecondary" component="h2"><b>{this.props.contract.usufructAddress}</b> has been updated to: <b>{this.props.newUsufructAddress}</b>.</Typography>

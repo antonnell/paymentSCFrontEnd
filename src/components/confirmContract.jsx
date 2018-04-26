@@ -21,7 +21,7 @@ class ConfirmContract extends Component {
       <CardContent>
         <Grid container xs={12} direction="row" justify="center">
           <Grid item xs={12}>
-            <Typography align='center' color="textSecondary" variant="headline" component="h2">Success</Typography>
+            <Typography align='center' color="textSecondary" variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Success</Typography>
           </Grid>
           <Grid item xs={12}>
             <Typography align='center' color="textSecondary" component="h2">Your transaction has been successfully submitted.</Typography>

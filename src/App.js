@@ -30,6 +30,7 @@ import UpdateContractUsufruct from './components/updateContractUsufruct.jsx';
 import PendingApprovals from './components/pendingApprovals.jsx';
 import ConfirmContract from './components/confirmContract.jsx';
 import MyContracts from './components/myContracts.jsx';
+import MyProfile from './components/myProfile.jsx';
 import Welcome from './components/welcome.jsx';
 import NewAccount from './components/newAccount.jsx';
 import AppDrawer from './components/drawer.jsx';
@@ -155,12 +156,15 @@ class App extends Component {
       drawerOpen: false
     };
 
+    this.getContract = this.getContract.bind(this);
+
     this.submitSetupContract = this.submitSetupContract.bind(this);
     this.submitFundContract = this.submitFundContract.bind(this);
     this.submitWithdrawContract = this.submitWithdrawContract.bind(this);
     this.submitSearchContract = this.submitSearchContract.bind(this);
     this.submitStartContract = this.submitStartContract.bind(this);
     this.submitTerminateContract = this.submitTerminateContract.bind(this);
+    this.submitApproveContract = this.submitApproveContract.bind(this);
     this.submitUpdatePayee = this.submitUpdatePayee.bind(this);
     this.submitUpdatePayer = this.submitUpdatePayer.bind(this);
     this.submitUpdateUsufruct = this.submitUpdateUsufruct.bind(this);
@@ -184,7 +188,9 @@ class App extends Component {
     this.submitApprovalsNavigate = this.submitApprovalsNavigate.bind(this);
     this.submitRegisterNavigate = this.submitRegisterNavigate.bind(this);
 
-    this.processSetupContract = this.processSetupContract.bind(this);
+    this.processSetupIntervalContract = this.processSetupIntervalContract.bind(this);
+    this.processSetupApprovalContract = this.processSetupApprovalContract.bind(this);
+    this.processSetupReturned = this.processSetupReturned.bind(this);
     this.processFundContract = this.processFundContract.bind(this);
     this.processWithdrawContract = this.processWithdrawContract.bind(this);
     this.processUpdatePayee = this.processUpdatePayee.bind(this);
@@ -192,6 +198,8 @@ class App extends Component {
     this.processUpdatePayer = this.processUpdatePayer.bind(this);
     this.processUpdatePayerRequest = this.processUpdatePayerRequest.bind(this);
     this.processUpdateUsufructRequest = this.processUpdateUsufructRequest.bind(this);
+    this.processSearchContract = this.processSearchContract.bind(this);
+    this.processSearch = this.processSearch.bind(this);
 
     this.reset = this.reset.bind(this);
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
@@ -204,6 +212,14 @@ class App extends Component {
     this.onLoginKeyDown = this.onLoginKeyDown.bind(this);
 
     this.locationHashChanged = this.locationHashChanged.bind(this);
+
+  };
+
+  componentWillMount() {
+    var currentScreen = window.location.hash.substring(1);
+    if(!['welcome', 'newAccount', 'setupContract', 'searchContract'].includes(currentScreen)) {
+      window.location.hash = 'searchContract';
+    }
   };
 
   componentDidMount() {
@@ -229,18 +245,21 @@ class App extends Component {
       }
     })
 
-    this.setState({constData: Config.paymentIntervalData});
-    this.setState({constAbi: Config.paymentIntervalAbi});
+    this.setState({constIntervalData: Config.paymentIntervalData});
+    this.setState({constIntervalAbi: Config.paymentIntervalAbi});
+    this.setState({constApprovalData: Config.paymentApprovalData});
+    this.setState({constApprovalAbi: Config.paymentApprovalAbi});
 
+    this.locationHashChanged();
   };
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.updateWindowDimensions);
-  }
+  };
 
   updateWindowDimensions() {
     this.setState({ width: window.innerWidth, height: window.innerHeight });
-  }
+  };
 
   reset() {
     this.setState({
@@ -276,7 +295,8 @@ class App extends Component {
       walletAddress: '',
       walletAddressError: false,
 
-      contractType: null
+      contractType: null,
+      currentContract: null
     });
   };
   handleChange = name => event => {
@@ -357,7 +377,8 @@ class App extends Component {
   };
 
   processUpdatePayee() {
-    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.currentContract.contractAddress);
+    const myContract = this.getContract(this.state.currentContract);
+    if(myContract == null) { return this.setState({error: 'Invalid Contract Type', loading: 'false'}); }
     var that = this;
 
     myContract.setPayeeAddress(this.state.newPayeeAddress, {
@@ -371,7 +392,8 @@ class App extends Component {
   };
 
   processUpdatePayeeRequest() {
-    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.currentContract.contractAddress);
+    const myContract = this.getContract(this.state.currentContract);
+    if(myContract == null) { return this.setState({error: 'Invalid Contract Type', loading: 'false'}); }
     var that = this;
 
     myContract.requestPayeeUpdate(this.state.newPayeeAddress, {
@@ -408,7 +430,8 @@ class App extends Component {
   };
 
   processUpdatePayer() {
-    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.currentContract.contractAddress);
+    const myContract = this.getContract(this.state.currentContract);
+    if(myContract == null) { return this.setState({error: 'Invalid Contract Type', loading: 'false'}); }
     var that = this;
 
     myContract.setPayerAddress(this.state.newPayerAddress, {
@@ -422,7 +445,8 @@ class App extends Component {
   };
 
   processUpdatePayerRequest() {
-    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.currentContract.contractAddress);
+    const myContract = this.getContract(this.state.currentContract);
+    if(myContract == null) { return this.setState({error: 'Invalid Contract Type', loading: 'false'}); }
     var that = this;
 
     myContract.requestPayerUpdate(this.state.newPayerAddress, {
@@ -455,7 +479,8 @@ class App extends Component {
   };
 
   processUpdateUsufructRequest() {
-    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.currentContract.contractAddress);
+    const myContract = this.getContract(this.state.currentContract);
+    if(myContract == null) { return this.setState({error: 'Invalid Contract Type', loading: 'false'}); }
     var that = this;
 
     myContract.requestUsufructUpdate(this.state.newUsufructAddress, {
@@ -468,30 +493,46 @@ class App extends Component {
     })
   };
 
+  submitApproveContract() {
+    this.setState({loading: true, error: null});
+
+    const myContract = this.getContract(this.state.currentContract);
+    if(myContract == null) { return this.setState({error: 'Invalid Contract Type', loading: 'false'}); }
+
+    var that = this
+    myContract.approvePayout({from: this.state.accounts[0]}, (error, result) => {
+      if(error) return that.setState({error:error.toString(), loading: false});
+      that.setState({transactionHash: result, error: null, loading: false, loaded:true});
+      window.location.hash = 'confirmContract';
+    });
+  };
+
   submitStartContract() {
     this.setState({loading: true, error: null});
-    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.currentContract.contractAddress);
-    if(typeof myContract !== 'undefined') {
-      var that = this
-      myContract.startContract({from: this.state.accounts[0]}, (error, result) => {
-        if(error) return that.setState({error:error.toString(), loading: false});
-        that.setState({transactionHash: result, error: null, loading: false, loaded:true});
-        window.location.hash = 'confirmContract';
-      });
-    }
+
+    const myContract = this.getContract(this.state.currentContract);
+    if(myContract == null) { return this.setState({error: 'Invalid Contract Type', loading: 'false'}); }
+
+    var that = this
+    myContract.startContract({from: this.state.accounts[0]}, (error, result) => {
+      if(error) return that.setState({error:error.toString(), loading: false});
+      that.setState({transactionHash: result, error: null, loading: false, loaded:true});
+      window.location.hash = 'confirmContract';
+    });
   };
 
   submitTerminateContract() {
     this.setState({loading: true, error: null});
-    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.currentContract.contractAddress);
-    if(typeof myContract !== 'undefined') {
-      var that = this
-      myContract.terminateContract({from: this.state.accounts[0]}, (error, result) => {
-        if(error) return that.setState({error:error.toString(), loading: false});
-        that.setState({transactionHash: result, error: null, loading: false, loaded:true});
-        window.location.hash = 'confirmContract';
-      });
-    }
+
+    const myContract = this.getContract(this.state.currentContract);
+    if(myContract == null) { return this.setState({error: 'Invalid Contract Type', loading: 'false'}); }
+
+    var that = this
+    myContract.terminateContract({from: this.state.accounts[0]}, (error, result) => {
+      if(error) return that.setState({error:error.toString(), loading: false});
+      that.setState({transactionHash: result, error: null, loading: false, loaded:true});
+      window.location.hash = 'confirmContract';
+    });
   };
 
   submitSearchContract() {
@@ -509,34 +550,53 @@ class App extends Component {
     if (error) {
       this.setState({loading: false});
     } else {
-      this.processSearchContract();
+      this.processSearch();
     }
   };
 
-  processSearchContract() {
-    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.searchContract);
+  processSearch() {
+    var that = this;
+
+    var currentContract = this.state.currentContract;
+    if(currentContract == null) {
+      currentContract = {}
+    }
+
+    this.setState({currentContract});
+
+    var intervalContract = window.web3.eth.contract(this.state.constIntervalAbi).at(this.state.searchContract)
+    intervalContract.getContractDetails({from: this.state.accounts[0]}, (error, result) => {
+      if(error) return that.setState({error:error.toString(), loading: false});
+      console.log(result)
+      var currentContract = that.state.currentContract;
+      currentContract.contractAddress = that.state.searchContract;
+      currentContract.payerAddress = result[0];
+      currentContract.payeeAddress = result[1];
+      currentContract.usufructAddress = result[2];
+      currentContract.contractType = result[3];
+      if(currentContract.contractType == 'Interval') {
+        currentContract.paymentAmount = result[4].c[0];
+        currentContract.paymentInterval = result[5].c[0];
+        currentContract.payerBalance = result[6].c[0];
+        currentContract.payeeBalance = result[7].c[0];
+      } else if (currentContract.contractType == 'Approval') {
+        currentContract.paymentAmount = result[4].c[0];
+        currentContract.payerBalance = result[5].c[0];
+        currentContract.payeeBalance = result[6].c[0];
+      } else {
+        //eh
+      }
+      that.setState({currentContract});
+
+      that.processSearchContract(that.getContract(currentContract))
+    });
+  };
+
+  processSearchContract(myContract) {
     if(typeof myContract !== 'undefined') {
       var that = this;
 
-      var currentContract = this.state.currentContract;
-      if(currentContract == null) {
-        currentContract = {}
-      }
-      currentContract.contractAddress = this.state.searchContract
-
-      this.setState({currentContract});
-
-
-      myContract.getContractDetails({from: this.state.accounts[0]}, (error, result) => {
-        if(error) return that.setState({error:error.toString(), loading: false});
-
-        var currentContract = that.state.currentContract;
-        currentContract.payerAddress = result[0]
-        currentContract.payeeAddress = result[1]
-        currentContract.usufructAddress = result[2]
-        that.setState({currentContract});
-      });
-      myContract.getPayeeBalance({from: this.state.accounts[0]}, (error, result) => {
+      /*myContract.getPayeeBalance({from: this.state.accounts[0]}, (error, result) => {
         if(error) return that.setState({error:error.toString(), loading: false});
 
         var currentContract = that.state.currentContract;
@@ -546,10 +606,11 @@ class App extends Component {
       myContract.getPayerBalance({from: this.state.accounts[0]}, (error, result) => {
         if(error) return that.setState({error:error.toString(), loading: false});
 
+        console.log(result)
         var currentContract = that.state.currentContract;
         currentContract.fundsDeposited = result.c[0]
         that.setState({currentContract});
-      });
+      });*/
       myContract.getContractState({from: this.state.accounts[0]}, (error, result) => {
         if(error) return that.setState({error:error.toString(), loading: false});
 
@@ -559,7 +620,11 @@ class App extends Component {
             state = 'Created'
             break;
           case 1:
-            state = 'In Progress'
+            if(that.state.currentContract.contractType == 'Interval') {
+              state = 'In Progress'
+            } else {
+              state = 'Approved'
+            }
             break;
           case 2:
             state = 'Terminated'
@@ -617,7 +682,8 @@ class App extends Component {
   processWithdrawContract() {
     var _amount = this.state.withdrawAmount;
 
-    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.currentContract.contractAddress);
+    const myContract = this.getContract(this.state.currentContract);
+    if(myContract == null) { return this.setState({error: 'Invalid Contract Type', loading: 'false'}); }
     var that = this;
 
     myContract.withdrawPayment(_amount, {
@@ -653,7 +719,8 @@ class App extends Component {
   processFundContract() {
     var _amount = this.state.depositAmount;
 
-    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.currentContract.contractAddress);
+    const myContract = this.getContract(this.state.currentContract);
+    if(myContract == null) { return this.setState({error: 'Invalid Contract Type', loading: 'false'}); }
     var that = this;
 
     myContract.depositFunds(_amount, {
@@ -788,22 +855,39 @@ class App extends Component {
       this.setState({ paymentAmountError: true });
       error = true;
     }
-    if (this.state.contractType=='interval' && this.state.paymentInterval=='') {
+    if (this.state.contractType=='Interval' && this.state.paymentInterval=='') {
       this.setState({ paymentIntervalError: true });
       error = true;
     }
-    if (error) {
+    if (error) {3
       this.setState({loading: false})
     } else {
-      this.processSetupContract()
+      this.setState({loading:true, error: null})
+      if(this.state.contractType=='Interval') {
+        this.processSetupIntervalContract()
+      } else {
+        this.processSetupApprovalContract()
+      }
     }
   };
-  async processSetupContract() {
-    this.setState({loading:true, error: null})
-    let code = this.state.constData;
-    let abi = this.state.constAbi
+  processSetupApprovalContract() {
+    let paymentApprovalContract = window.web3.eth.contract(this.state.constApprovalAbi);
 
-    let paymentIntervalContract = window.web3.eth.contract(abi);
+    var that = this;
+    let contract = paymentApprovalContract.new(
+      this.state.payer,
+      this.state.payee,
+      this.state.paymentAmount,
+      {
+        from: this.state.accounts[0],
+        gas: '4700000',
+        data: this.state.constApprovalData
+      },
+      this.processSetupReturned
+    );
+  };
+  processSetupIntervalContract() {
+    let paymentIntervalContract = window.web3.eth.contract(this.state.constIntervalAbi);
 
     var that = this;
     let contract = paymentIntervalContract.new(
@@ -814,24 +898,39 @@ class App extends Component {
       {
         from: this.state.accounts[0],
         gas: '4700000',
-        data: code
+        data: this.state.constIntervalData
       },
-      function (error, contract){
-        if(error) return that.setState({error:error.toString(), loading: false});
-
-        if (typeof contract !== 'undefined' && typeof contract.address !== 'undefined') {
-           console.log('Contract mined! address: ' + contract.address + ' transactionHash: http://testnet.etherscan.io/tx/' + contract.transactionHash);
-
-           that.setState({loading:false, loaded:true, contract: contract})
-        }
-      }
+      this.processSetupReturned
     );
+  };
+
+  processSetupReturned(error, contract) {
+    if(error) return this.setState({error:error.toString(), loading: false});
+
+    if (typeof contract !== 'undefined' && typeof contract.address !== 'undefined') {
+      this.setState({loading:false, loaded:true, contract: contract})
+    }
+  };
+
+  getContract(contract) {
+    if(contract == null) {
+      return null
+    }
+
+    if(contract.contractType == 'Interval') {
+      return window.web3.eth.contract(this.state.constIntervalAbi).at(contract.contractAddress)
+    } else if (contract.contractType == 'Approval') {
+      return window.web3.eth.contract(this.state.constApprovalAbi).at(contract.contractAddress)
+    } else {
+      return null
+    }
   };
 
   submitPayeeApprove() {
     this.setState({loading:true, error: null})
 
-    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.currentContract.contractAddress);
+    const myContract = this.getContract(this.state.currentContract);
+    if(myContract == null) { return this.setState({error: 'Invalid Contract Type', loading: 'false'}); }
     var that = this;
 
     myContract.requestPayeeUpdate(this.state.pendingPayeeUpdate.toAddress, {
@@ -847,7 +946,8 @@ class App extends Component {
   submitPayeeReject() {
     this.setState({loading:true, error: null})
 
-    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.currentContract.contractAddress);
+    const myContract = this.getContract(this.state.currentContract);
+    if(myContract == null) { return this.setState({error: 'Invalid Contract Type', loading: 'false'}); }
     var that = this;
 
     myContract.rejectPayeeUpdate(this.state.pendingPayeeUpdate.toAddress, {
@@ -863,7 +963,8 @@ class App extends Component {
   submitPayerApprove() {
     this.setState({loading:true, error: null})
 
-    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.currentContract.contractAddress);
+    const myContract = this.getContract(this.state.currentContract);
+    if(myContract == null) { return this.setState({error: 'Invalid Contract Type', loading: 'false'}); }
     var that = this;
 
     myContract.requestPayerUpdate(this.state.pendingPayerUpdate.toAddress, {
@@ -879,7 +980,8 @@ class App extends Component {
   submitPayerReject() {
     this.setState({loading:true, error: null})
 
-    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.currentContract.contractAddress);
+    const myContract = this.getContract(this.state.currentContract);
+    if(myContract == null) { return this.setState({error: 'Invalid Contract Type', loading: 'false'}); }
     var that = this;
 
     myContract.rejectPayerUpdate(this.state.pendingPayerUpdate.toAddress, {
@@ -895,7 +997,8 @@ class App extends Component {
   submitUsufructApprove() {
     this.setState({loading:true, error: null})
 
-    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.currentContract.contractAddress);
+    const myContract = this.getContract(this.state.currentContract);
+    if(myContract == null) { return this.setState({error: 'Invalid Contract Type', loading: 'false'}); }
     var that = this;
 
     myContract.requestUsufructUpdate(this.state.pendingUsufructUpdate.toAddress, {
@@ -911,7 +1014,8 @@ class App extends Component {
   submitUsufructReject() {
     this.setState({loading:true, error: null})
 
-    const myContract = window.web3.eth.contract(this.state.constAbi).at(this.state.currentContract.contractAddress);
+    const myContract = this.getContract(this.state.currentContract);
+    if(myContract == null) { return this.setState({error: 'Invalid Contract Type', loading: 'false'}); }
     var that = this;
 
     myContract.rejectUsufructUpdate(this.state.pendingUsufructUpdate.toAddress, {
@@ -1092,6 +1196,11 @@ class App extends Component {
       submitBack={this.submitViewBack} />)
   };
 
+  renderMyProfile() {
+    return (<MyProfile
+      submitBack={this.submitViewBack} />)
+  };
+
   renderWelcome() {
     return (<Welcome
       handleChange={this.handleChange}
@@ -1150,6 +1259,7 @@ class App extends Component {
       submitApprovalsNavigate={this.submitApprovalsNavigate}
       submitStartContract={this.submitStartContract}
       submitTerminateContract={this.submitTerminateContract}
+      submitApproveContract={this.submitApproveContract}
       reset={this.reset}
       handleChange={this.handleChange}
       contract={this.state.currentContract}
@@ -1271,14 +1381,14 @@ class App extends Component {
     } else {
 
       var fabButton = (<Tooltip title='Create a new contract'>
-        <Button variant="fab" color='secondary' style={{position: 'absolute', top:'157px', left: '20px'}} onClick={this.submitCreateNavigate}>
+        <Button variant="fab" color='secondary' style={{position: 'absolute', top:'157px', left: '20px'}} disabled={this.state.loading} onClick={this.submitCreateNavigate}>
           +
         </Button>
       </Tooltip>)
 
       if(this.state.currentScreen == 'setupContract') {
         fabButton = (<Tooltip title='Search for your contract'>
-          <Button variant="fab" color='secondary' style={{position: 'absolute', top:'157px', left: '20px'}} onClick={this.submitSearchNavigate}>
+          <Button variant="fab" color='secondary' style={{position: 'absolute', top:'157px', left: '20px'}} disabled={this.state.loading} onClick={this.submitSearchNavigate}>
             <SearchIcon />
           </Button>
         </Tooltip>)
@@ -1323,11 +1433,15 @@ class App extends Component {
     }
   };
   locationHashChanged() {
-    var currentScreen = window.location.hash.substring(1)
+    var currentScreen = window.location.hash.substring(1);
     if(currentScreen == '') {
-      this.setState({currentScreen: 'welcome'})
+      this.setState({currentScreen: 'welcome'});
     } else {
-      this.setState({currentScreen})
+      if(!['welcome', 'newAccount', 'setupContract'].includes(currentScreen) && this.state.currentContract == null) {
+        window.location.hash = 'searchContract';
+        currentScreen = 'searchContract';
+      }
+      this.setState({currentScreen});
     }
   };
   renderScreen() {
@@ -1376,6 +1490,9 @@ class App extends Component {
         break;
       case 'myContracts':
         return this.renderMyContracts();
+        break;
+      case 'myProfile':
+        return this.renderMyProfile();
         break;
       default:
         return this.renderSearchContract();

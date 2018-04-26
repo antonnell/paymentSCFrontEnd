@@ -62,12 +62,12 @@ class AppDrawer extends Component {
         <Grid container xs={12} alignItems="flex-start" spacing={0}>
           <Grid item xs={12}>
             <div style={{width: '100%', height: '150px', padding: '24px', background: '#424242'}} color='secondary'>
-              <Avatar style={{marginTop: '16px', marginBottom: '12px', backgroundColor: '#ffe400', color: '#000000'}} alt="Name Surname">A</Avatar>
+              <Avatar style={{marginTop: '16px', marginBottom: '12px', backgroundColor: '#ffe400', color: '#000000'}} alt="Name Surname">J</Avatar>
               <Typography variant="body2" style={{color: '#FFFFFF '}}>
-                Anton Nell
+                John Smith
               </Typography>
               <Typography variant="body1" style={{color: '#FFFFFF '}}>
-                anton@domain.com
+                johnsmith@domain.com
               </Typography>
             </div>
             <div>

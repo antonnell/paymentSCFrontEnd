@@ -25,7 +25,7 @@ class DepositContract extends Component {
       return(<CardContent>
         <Grid container xs={12} direction="row" justify="center">
           <Grid item xs={12}>
-            <Typography align='center' color="textSecondary" variant="headline" component="h2">Deposit is complete!</Typography>
+            <Typography align='center' color="textSecondary" variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Deposit is complete!</Typography>
           </Grid>
           <Grid item xs={12}>
             <Typography align='center' color="textSecondary" component="h2"><b>{this.props.depositAmount}</b> has been depositted to: <b>{this.props.contract.contractAddress}</b>.</Typography>
@@ -53,7 +53,7 @@ class DepositContract extends Component {
               <Grid container xs={12} direction="column" justify="center">
                 <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Fund Contract</Typography></Grid>
                 <Grid item xs={12}>
-                  <Typography component="h2">Balance: {this.props.contract.fundsDeposited}</Typography>
+                  <Typography component="h2">Balance: {this.props.contract.payerBalance}</Typography>
                 </Grid>
                 <Grid item xs={12} >
                   <TextField required fullWidth={true} color="textSecondary" required error={this.props.depositAmountError} disabled={this.props.loading}

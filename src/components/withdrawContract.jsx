@@ -25,7 +25,7 @@ class WithdrawContract extends Component {
       return(<CardContent>
         <Grid container xs={12} direction="row" justify="center">
           <Grid item xs={12}>
-            <Typography align='center' color="textSecondary" variant="headline" component="h2">Withdrawal is complete!</Typography>
+            <Typography align='center' color="textSecondary" variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Withdrawal is complete!</Typography>
           </Grid>
           <Grid item xs={12}>
             <Typography align='center' color="textSecondary" component="h2"><b>{this.props.withdrawAmount}</b> has been withdrawn to: <b>{this.props.contract.contractAddress}</b>.</Typography>
@@ -54,7 +54,7 @@ class WithdrawContract extends Component {
                   <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Withdraw Contract</Typography></Grid>
                   <Grid item xs={12}><Typography align='center'>{"For more information, head over to https://www.bitdiem.com/"}</Typography></Grid>
                   <Grid item xs={12}>
-                    <Typography component="h2">Available: {this.props.contract.fundsWithdrawable}</Typography>
+                    <Typography component="h2">Available: {this.props.contract.payeeBalance}</Typography>
                   </Grid>
                   <Grid item xs={12} >
                     <TextField required fullWidth={true} color="textSecondary" required error={this.props.withdrawAmountError} disabled={this.props.loading}

@@ -46,16 +46,27 @@ class SearchContract extends Component {
 
   render() {
 
-    var startTerminated = (
-      <ListItem button onClick={this.props.submitStartContract}>
-        <ListItemText primary="Start Contract" />
-      </ListItem>)
+    var startTerminatedApprove = null
 
-    if(this.props.contract.contractState=='In Progress') {
-      startTerminated = (
-        <ListItem button onClick={this.props.submitTerminateContract}>
-          <ListItemText primary="Terminate Contract" />
-        </ListItem>)
+    if(this.props.contract.contractType == 'Approval') {
+      if(this.props.contract.contractState=='Created') {
+        startTerminatedApprove = (
+          <ListItem button onClick={this.props.submitApproveContract}>
+            <ListItemText primary="Approve Payout" />
+          </ListItem>)
+      }
+    } else if (this.props.contract.contractType == 'Interval') {
+      if(this.props.contract.contractState=='Created') {
+        startTerminatedApprove = (
+          <ListItem button onClick={this.props.submitStartContract}>
+            <ListItemText primary="Start Contract" />
+          </ListItem>)
+      } else if(this.props.contract.contractState=='In Progress') {
+        startTerminatedApprove = (
+          <ListItem button onClick={this.props.submitTerminateContract}>
+            <ListItemText primary="Terminate Contract" />
+          </ListItem>)
+      }
     }
 
     var infoStyle = {
@@ -90,6 +101,12 @@ class SearchContract extends Component {
                   <Typography component="h2" style={infoStyle}>{this.props.contract.contractAddress}</Typography>
                 </Grid>
                 <Grid item xs={12} sm={4}>
+                  <Typography component="h2"><b>Contract Type:</b></Typography>
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                  <Typography component="h2" style={infoStyle}>{this.props.contract.contractType}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={4}>
                   <Typography component="h2"><b>Contract State:</b></Typography>
                 </Grid>
                 <Grid item xs={12} sm={8}>
@@ -97,16 +114,29 @@ class SearchContract extends Component {
                 </Grid>
                 <Grid item xs={12} style={{marginTop:10}}></Grid>
                 <Grid item xs={12} sm={4}>
+                  <Typography component="h2"><b>Payment Amount:</b></Typography>
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                  <Typography component="h2" style={infoStyle}>{this.props.contract.paymentAmount} wei</Typography>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Typography component="h2"><b>Payment Interval:</b></Typography>
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                  <Typography component="h2" style={infoStyle}>{this.props.contract.paymentInterval!=null?(this.props.contract.paymentInterval+' blocks'):'N/A'}</Typography>
+                </Grid>
+                <Grid item xs={12} style={{marginTop:10}}></Grid>
+                <Grid item xs={12} sm={4}>
                   <Typography component="h2"><b>Funds Deposited:</b></Typography>
                 </Grid>
                 <Grid item xs={12} sm={8}>
-                  <Typography component="h2" style={infoStyle}>{this.props.contract.fundsDeposited}</Typography>
+                  <Typography component="h2" style={infoStyle}>{this.props.contract.payerBalance} wei</Typography>
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <Typography component="h2"><b>Funds Available:</b></Typography>
                 </Grid>
                 <Grid item xs={12} sm={8}>
-                  <Typography component="h2" style={infoStyle}>{this.props.contract.fundsWithdrawable}</Typography>
+                  <Typography component="h2" style={infoStyle}>{this.props.contract.payeeBalance} wei</Typography>
                 </Grid>
                 <Grid item xs={12} style={{marginTop:10}}></Grid>
                 <Grid item xs={12} sm={4}>
@@ -138,7 +168,7 @@ class SearchContract extends Component {
               Back
             </Button>
           </Grid>
-          <Grid item xs={10} sm={10} align='right' spacing={0}>
+          <Grid item xs={10} sm={10} align='right'>
             <Button style={{verticalAlign: 'middle'}} size="small" variant="flat" color="secondary" disabled={this.props.loading||this.props.contract.contractState=='Terminated'} onClick={this.props.submitDepositNavigate}>
               Deposit
             </Button>
@@ -173,7 +203,7 @@ class SearchContract extends Component {
               }}
             >
             <List component="nav">
-              {startTerminated}
+              {startTerminatedApprove}
               <ListItem button onClick={this.props.submitUpdatePayerNavigate}>
                 <ListItemText primary="Update Payer" />
               </ListItem>

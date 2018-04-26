@@ -89,7 +89,7 @@ class SetupContract extends Component {
       return(<CardContent>
         <Grid container xs={12} direction="row" justify="center" spacing={0}>
           <Grid item xs={12}>
-            <Typography align='center' color="textSecondary" variant="headline" component="h2">Contract setup is complete!</Typography>
+            <Typography align='center' color="textSecondary" variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Contract setup is complete!</Typography>
           </Grid>
           <Grid item xs={12}>
             <Typography align='center' color="textSecondary" component="h2">Your contract address is: <b>{this.props.contract.address}</b>.</Typography>
@@ -115,10 +115,10 @@ class SetupContract extends Component {
               <Typography align='left' color="textPrimary" component="h2" style={{marginBottom:12}}>Select one of the contract types below.</Typography>
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={6} xl={6} >
-              <ContractCard handleClick={this.props.handleProductSelect} type='interval' heading="Interval Contract" text="Payments are made on a routine basis! You just tell us when you want to withdraw." icon={<IntervalIcon style={{fontSize:'75px', color: '#1b1b1b'}} />} />
+              <ContractCard handleClick={this.props.handleProductSelect} type='Interval' heading="Interval Contract" text="Payments are made on a routine basis! You just tell us when you want to withdraw." icon={<IntervalIcon style={{fontSize:'75px', color: '#1b1b1b'}} />} />
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={6} xl={6} >
-              <ContractCard handleClick={this.props.handleProductSelect} type='approval' heading="Approval Contract" text="A payment is made once the job is complete! You just have to tell us when you are done." icon={<ApprovalIcon style={{fontSize:'75px', color: '#1b1b1b'}}  />} />
+              <ContractCard handleClick={this.props.handleProductSelect} type='Approval' heading="Approval Contract" text="A payment is made once the job is complete! You just have to tell us when you are done." icon={<ApprovalIcon style={{fontSize:'75px', color: '#1b1b1b'}}  />} />
             </Grid>
           </Grid>
           <Grid container xs={12} direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
@@ -134,7 +134,7 @@ class SetupContract extends Component {
 
     var interval = null;
 
-    if(this.props.contractType == 'interval') {
+    if(this.props.contractType == 'Interval') {
       interval = (<Grid item xs={12} >
         <TextField required fullWidth={true} color="textSecondary" required error={this.props.paymentIntervalError} disabled={this.props.loading}
           id="paymentInterval" label="Payment Interval" value={this.props.paymentInterval}
