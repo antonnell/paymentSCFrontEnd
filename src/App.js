@@ -33,6 +33,8 @@ import MyContracts from './components/myContracts.jsx';
 import MyProfile from './components/myProfile.jsx';
 import Welcome from './components/welcome.jsx';
 import NewAccount from './components/newAccount.jsx';
+import ForgotPassword from './components/forgotPassword.jsx';
+import ForgotPasswordDone from './components/forgotPasswordDone.jsx';
 import AppDrawer from './components/drawer.jsx';
 
 const Config = require('./config.js');
@@ -81,34 +83,13 @@ function MenuIcon(props) {
 
 
 const theme = createMuiTheme({
-  /*palette: {
-    primary: {
-      light: '#ffff55',
-      main: '#ffe400',
-      dark: '#c7b200',
-      contrastText: '#000000',
+  overrides: {
+    MuiButton: {
+      root: {
+         borderRadius: 0
+      }
     },
-    secondary: {
-      light: '#6d6d6d',
-      main: '#424242',
-      dark: '#1b1b1b',
-      contrastText: '#ffffff',
-    }
-  },*/
-  /*palette: {
-    primary: {
-      light: '#ffff55',
-      main: '#ffe400',
-      dark: '#c7b200',
-      contrastText: '#000000',
-    },
-    secondary: {
-      light: '#2c2c2c',
-      main: '#000000',
-      dark: '#000000',
-      contrastText: '#ffffff',
-    }
-  },*/
+  },
   palette: {
     primary: {
       light: '#6681ff',
@@ -120,6 +101,45 @@ const theme = createMuiTheme({
       light: '#ffed4d',
       main: '#ffbb00',
       dark: '#c78b00',
+      contrastText: '#000000',
+    }
+  },
+});
+
+const welcomeTheme = createMuiTheme({
+  overrides:{
+    MuiButton: {
+      root: {
+         borderRadius: 0
+      }
+    },
+    MuiInput: {
+      underline: {
+        '&:before': { //underline color when textfield is inactive
+          backgroundColor: '#FFF',
+          height: '1px'
+        },
+        '&:hover:not($disabled):before': { //underline color when hovered
+          backgroundColor: '#FFF',
+          height: '1px'
+        },
+        '&:after': {
+          backgroundColor: '#ffca41',
+        }
+      }
+    },
+  },
+  palette: {
+    primary: {
+      light: '#6681ff',
+      main: '#0055eb',
+      dark: '#002db7',
+      contrastText: '#ffffff',
+    },
+    secondary: {
+      light: '#fffd74',
+      main: '#ffca41',
+      dark: '#c89a00',
       contrastText: '#000000',
     }
   },
@@ -188,6 +208,7 @@ class App extends Component {
     this.submitPayerReject = this.submitPayerReject.bind(this);
     this.submitLogin = this.submitLogin.bind(this);
     this.submitRegister = this.submitRegister.bind(this);
+    this.submitForgotPassword = this.submitForgotPassword.bind(this);
 
     this.submitBack = this.submitBack.bind(this);
     this.submitViewBack = this.submitViewBack.bind(this);
@@ -201,6 +222,7 @@ class App extends Component {
     this.submitSearchNavigate = this.submitSearchNavigate.bind(this);
     this.submitApprovalsNavigate = this.submitApprovalsNavigate.bind(this);
     this.submitRegisterNavigate = this.submitRegisterNavigate.bind(this);
+    this.submitForgotPasswordNavigate = this.submitForgotPasswordNavigate.bind(this);
 
     this.processSetupIntervalContract = this.processSetupIntervalContract.bind(this);
     this.processSetupApprovalContract = this.processSetupApprovalContract.bind(this);
@@ -214,6 +236,7 @@ class App extends Component {
     this.processUpdateUsufructRequest = this.processUpdateUsufructRequest.bind(this);
     this.processSearchContract = this.processSearchContract.bind(this);
     this.processSearch = this.processSearch.bind(this);
+    this.processForgotPassword = this.processForgotPassword.bind(this);
 
     this.reset = this.reset.bind(this);
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
@@ -231,7 +254,7 @@ class App extends Component {
 
   componentWillMount() {
     var currentScreen = window.location.hash.substring(1);
-    if(!['welcome', 'newAccount', 'setupContract', 'searchContract'].includes(currentScreen)) {
+    if(!['welcome', 'newAccount', 'setupContract', 'searchContract', 'forgotPassword', 'forgotPasswordDone'].includes(currentScreen)) {
       window.location.hash = 'searchContract';
     }
   };
@@ -365,6 +388,11 @@ class App extends Component {
   submitRegisterNavigate() {
     this.setState({error: null, loading: false, loaded:false});
     window.location.hash = 'newAccount';
+  };
+
+  submitForgotPasswordNavigate() {
+    this.setState({error: null, loading: false, loaded:false});
+    window.location.hash = 'forgotPassword';
   };
 
   submitUpdatePayee() {
@@ -775,6 +803,29 @@ class App extends Component {
   processLogin() {
     this.setState({loading: false, navValue: 'searchContract', username: '', password: ''})
     window.location.hash = 'searchContract';
+  };
+
+  submitForgotPassword() {
+    this.setState({
+      loading:true,
+      emailAddressError: false,
+      error: null
+    })
+    var error = false;
+    if (this.state.emailAddress == '') {
+      this.setState({ emailAddressError: true });
+      error = true;
+    }
+    if (error) {
+      this.setState({loading: false})
+    } else {
+      this.processForgotPassword()
+    }
+  };
+
+  processForgotPassword() {
+    this.setState({loading: false, navValue: 'welcome', username: '', password: ''})
+    window.location.hash = 'forgotPasswordDone';
   };
 
   submitRegister() {
@@ -1221,6 +1272,7 @@ class App extends Component {
       onLoginKeyDown={this.onLoginKeyDown}
       submitLogin={this.submitLogin}
       submitRegisterNavigate={this.submitRegisterNavigate}
+      submitForgotPasswordNavigate={this.submitForgotPasswordNavigate}
       username={this.state.username}
       usernameError={this.state.usernameError}
       password={this.state.password}
@@ -1231,7 +1283,7 @@ class App extends Component {
   renderNewAccount() {
     return (<NewAccount
       handleChange={this.handleChange}
-      onLoginKeyDown={this.onLoginKeyDown}
+      onRegisterKeyDown={this.onRegisterKeyDown}
       submitRegister={this.submitRegister}
       submitRegisterBack={this.submitRegisterBack}
       username={this.state.username}
@@ -1242,6 +1294,23 @@ class App extends Component {
       emailAddressError={this.state.emailAddressError}
       walletAddress={this.state.walletAddress}
       walletAddressError={this.state.walletAddressError}
+      />)
+  };
+
+  renderForgotPassword() {
+    return (<ForgotPassword
+      handleChange={this.handleChange}
+      onForgotPasswordKeyDown={this.onForgotPasswordKeyDown}
+      submitForgotPassword={this.submitForgotPassword}
+      submitForgotPasswordBack={this.submitRegisterBack}
+      emailAddress={this.state.emailAddress}
+      emailAddressError={this.state.emailAddressError}
+      />)
+  };
+
+  renderForgotPasswordDone() {
+    return (<ForgotPasswordDone
+      submitForgotPasswordDoneBack={this.submitRegisterBack}
       />)
   };
 
@@ -1318,15 +1387,6 @@ class App extends Component {
         borderBottom: '1px solid #777777'
       }
     };
-
-    /*
-      screen breakpoints
-      xsm: < 600
-      sm: >= 600 + < 960
-      md: >= 960 + < 1280
-      lg: >= 1280 + < 1920
-      xl: >= 1920
-    */
     var size = '';
 
     if(this.state.width < 600) {
@@ -1347,11 +1407,11 @@ class App extends Component {
       overflowY: 'auto'
     }
 
-    if(['welcome', 'newAccount'].includes(this.state.currentScreen)) {
+    if(['welcome', 'newAccount', 'forgotPassword', 'forgotPasswordDone'].includes(this.state.currentScreen)) {
       return (
-        <MuiThemeProvider theme={theme}>
+        <MuiThemeProvider theme={welcomeTheme}>
           <CssBaseline />
-          <div style={{position: 'absolute', left: '0px', right: '0px', top:'0px', bottom: '0px', backgroundColor: '#ffe400'}}>
+          <div style={{position: 'absolute', left: '0px', right: '0px', top:'0px', bottom: '0px', backgroundColor: '#0055eb'}}>
             {this.renderScreen()}
           </div>
         </MuiThemeProvider>
@@ -1451,7 +1511,7 @@ class App extends Component {
     if(currentScreen == '') {
       this.setState({currentScreen: 'welcome'});
     } else {
-      if(!['welcome', 'newAccount', 'setupContract'].includes(currentScreen) && this.state.currentContract == null) {
+      if(!['welcome', 'newAccount', 'setupContract', 'forgotPassword', 'forgotPasswordDone'].includes(currentScreen) && this.state.currentContract == null) {
         window.location.hash = 'searchContract';
         currentScreen = 'searchContract';
       }
@@ -1465,6 +1525,12 @@ class App extends Component {
         break;
       case 'newAccount':
         return this.renderNewAccount();
+        break;
+      case 'forgotPassword':
+        return this.renderForgotPassword();
+        break;
+      case 'forgotPasswordDone':
+        return this.renderForgotPasswordDone();
         break;
       case 'searchContract':
         return this.renderSearchContract();

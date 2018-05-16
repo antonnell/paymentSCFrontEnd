@@ -17,44 +17,71 @@ class Welcome extends Component {
   };
 
   render() {
+    const style = theme => ({
+      whiteLabel: {
+        color: '#4CAF50',
+      },
+      whiteUnderline: {
+        '&:before': {
+          backgroundColor: '#4CAF50',
+        },
+      },
+      whiteUnderline: {
+        '&:after': {
+          backgroundColor: '#4CAF50',
+        },
+      },
+    })
     return (
       <Grid container justify="space-around" alignItems="center" direction="row" spacing={0}>
         <Grid container justify="space-around" alignItems="center" direction="row" spacing={0}>
           <Grid item xs={10} sm={6} md={4} lg={3} style={{marginTop: '100px'}} align='center'>
-            <Typography variant="headline" color="inherit">
-              BitDiem Network
+            <div style={{flex: 1}}>
+              <img src="LogoWhite@2x.png" width="180px" height="47px" alt="" />
+            </div>
+          </Grid>
+        </Grid>
+        <Grid container justify="space-around" alignItems="center" direction="row" spacing={0} style={{marginTop: '80px'}}>
+          <Grid item xs={10} sm={6} md={4} lg={3} align='center'>
+            <Typography variant="body2" style={{color: '#fff'}}>
+              Enter your BitDiem login credentials
             </Typography>
           </Grid>
-        </Grid><Grid container justify="space-around" alignItems="center" direction="row" spacing={0}>
-          <Grid item xs={10} sm={6} md={4} lg={3} style={{marginTop: '80px'}}>
-            <TextField required fullWidth={true} color="textSecondary" error={this.props.usernameError} disabled={this.props.loading}
-              id="username" label="Username" value={this.props.username}
-              onChange={this.props.handleChange('username')} margin="normal" onKeyDown={this.props.onLoginKeyDown} />
-            <TextField required fullWidth={true} color="textSecondary" type="password" error={this.props.passwordError} disabled={this.props.loading}
+        </Grid>
+        <Grid container justify="space-around" alignItems="center" direction="row" spacing={0} style={{marginTop: '24px'}}>
+          <Grid item xs={10} sm={6} md={4} lg={3}>
+            <TextField required fullWidth={true} error={this.props.usernameError} disabled={this.props.loading}
+              id="username" label="Email Address" value={this.props.username}
+              onChange={this.props.handleChange('username')} margin="normal" onKeyDown={this.props.onLoginKeyDown}
+              InputProps={{style: {color: '#FFF'}}}
+              InputLabelProps={{style: {color: '#FFF'}}} />
+            <TextField required fullWidth={true} color="primary" type="password" error={this.props.passwordError} disabled={this.props.loading}
               id="password" label="Password" value={this.props.password}
-              onChange={this.props.handleChange('password')} margin="normal" onKeyDown={this.props.onLoginKeyDown} />
+              onChange={this.props.handleChange('password')} margin="normal" onKeyDown={this.props.onLoginKeyDown}
+              InputProps={{style: {color: '#FFF'}}}
+              InputLabelProps={{style: {color: '#FFF'}}} />
           </Grid>
         </Grid>
         <Grid container justify="space-around" alignItems="center" direction="row" spacing={0}>
           <Grid item xs={10} sm={6} md={4} lg={3} align='right'>
-            <Typography color="inherit" style={{fontSize: '12px', cursor: 'pointer'}}>
+            <Typography style={{ color: '#fff', fontSize: '12px', cursor: 'pointer'}} onClick={this.props.submitForgotPasswordNavigate}>
               Forgot Password
             </Typography>
           </Grid>
         </Grid>
         <Grid container justify="space-around" alignItems="center" direction="row" spacing={0} style={{marginTop: '40px'}}>
           <Grid item xs={12} sm={12} md={12} lg={12} align='center'>
-            <Button variant="flat" size='large' color='secondary' style={{border:'2px solid #424242'}} onClick={this.props.submitLogin}>
+            <Button variant="raised" size='large' color='secondary' onClick={this.props.submitLogin}>
               LOGIN
             </Button>
           </Grid>
         </Grid>
         <Grid container justify="space-around" alignItems="center" direction="row" spacing={0} style={{marginTop: '40px'}}>
           <Grid item xs={12} sm={12} md={12} lg={12} align='center'>
-            <Typography color="inherit" style={{fontSize: '12px', width:'90px', display: 'inline-block'}}>
+            <Typography color="inherit" style={{color: '#fff', fontSize: '12px', width:'90px', display: 'inline-block'}}>
               No account yet?
             </Typography>
-            <Typography color="inherit" style={{fontSize: '12px', cursor: 'pointer', width: '60px', display: 'inline-block'}} onClick={this.props.submitRegisterNavigate}>
+            <Typography color="inherit" style={{color: '#fff', fontSize: '12px', cursor: 'pointer', width: '60px', display: 'inline-block'}} onClick={this.props.submitRegisterNavigate}>
               Create one
             </Typography>
           </Grid>
