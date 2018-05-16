@@ -59,14 +59,16 @@ class AppDrawer extends Component {
   render() {
     return (
       <Drawer open={this.props.open} onClose={this.props.closeDrawer}>
-        <Grid container xs={12} alignItems="flex-start" spacing={0}>
+        <Grid container alignItems="flex-start" spacing={0}>
           <Grid item xs={12}>
-            <div style={{width: '100%', height: '150px', padding: '24px', background: '#424242'}} color='secondary'>
-              <Avatar style={{marginTop: '16px', marginBottom: '12px', backgroundColor: '#ffe400', color: '#000000'}} alt="Name Surname">J</Avatar>
-              <Typography variant="body2" style={{color: '#FFFFFF '}}>
+            <div style={{width: '100%', height: '150px', padding: '19px', background: '#6681ff'}} color='secondary'>
+              <div style={{flex: 1}}>
+                <img src="LogoWhite@2x.png" width="180px" height="47px" alt="" />
+              </div>
+              <Typography variant="body2" style={{color: '#FFF', marginTop: '24px'}}>
                 John Smith
               </Typography>
-              <Typography variant="body1" style={{color: '#FFFFFF '}}>
+              <Typography variant="body1" style={{color: '#FFF'}}>
                 johnsmith@domain.com
               </Typography>
             </div>

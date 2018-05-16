@@ -19,7 +19,7 @@ class ConfirmContract extends Component {
     var address = 'https://rinkeby.etherscan.io/tx/'+this.props.transactionHash
     return (
       <CardContent>
-        <Grid container xs={12} direction="row" justify="center">
+        <Grid container direction="row" justify="center">
           <Grid item xs={12}>
             <Typography align='center' color="textSecondary" variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Success</Typography>
           </Grid>
@@ -33,7 +33,7 @@ class ConfirmContract extends Component {
             <Typography align='center' color="textSecondary" component="h2">You can view the <b>progress</b> of the transaction at <a href={address}>{address}</a>.</Typography>
           </Grid>
         </Grid>
-        <Grid container xs={12} direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
+        <Grid container direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
           <Grid item xs={12} sm={12} align='left'>
             <Button size="small" onClick={this.props.submitBack}>Back</Button>
           </Grid>

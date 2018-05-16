@@ -48,14 +48,14 @@ class ContractCard extends Component {
   render() {
     return(
       <Card elevation={this.state.elevation} onMouseOver={this.hover} onMouseOut={this.stopHover} onClick={() => {this.props.handleClick(this.props.type)}} style={{marginBottom: '8px', marginRight: '8px', cursor: 'pointer', padding:'8px'}} >
-        <Grid container xs={12} direction="row" justify="center">
+        <Grid container direction="row" justify="center">
           <Grid item xs={12}>
-            <Typography align='center' color="textSecondary" variant="headline" component="h2" style={{marginTop: '12px', marginBottom: '12px'}}>{this.props.heading}</Typography>
+            <Typography align='center' color="inherit" variant="headline" component="h2" style={{marginTop: '12px', marginBottom: '12px'}}>{this.props.heading}</Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography align='center' color="textSecondary">{this.props.text}</Typography>
+            <Typography align='center' color="inherit">{this.props.text}</Typography>
           </Grid>
-          <Grid item xs={12} align='center'>
+          <Grid item xs={12} align='center' style={{marginTop: '12px'}}>
             {this.props.icon}
           </Grid>
         </Grid>
@@ -87,7 +87,7 @@ class SetupContract extends Component {
 
     if(this.props.loaded) {
       return(<CardContent>
-        <Grid container xs={12} direction="row" justify="center" spacing={0}>
+        <Grid container direction="row" justify="center" spacing={0}>
           <Grid item xs={12}>
             <Typography align='center' color="textSecondary" variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Contract setup is complete!</Typography>
           </Grid>
@@ -98,9 +98,9 @@ class SetupContract extends Component {
             <Typography align='center' color="textSecondary" component="h2">Keep it safe, you can interact with the contract using this address.</Typography>
           </Grid>
         </Grid>
-        <Grid container xs={12} direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
+        <Grid container direction="row" justify="center" spacing={0} style={{position: 'relative', marginTop: '12px'}}>
           <Grid item xs={12} sm={12} align='left'>
-            <Button size="small" onClick={this.props.submitBack}>Back</Button>
+            <Button size="small" color="primary" onClick={this.props.submitBack}>Back</Button>
           </Grid>
         </Grid>
       </CardContent>)
@@ -109,21 +109,21 @@ class SetupContract extends Component {
     if(this.props.contractType == null) {
       return (
         <CardContent>
-          <Grid container xs={12} direction="row" justify="center" >
+          <Grid container direction="row" justify="center" >
             <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Setup Contract</Typography></Grid>
             <Grid item xs={12}>
-              <Typography align='left' color="textPrimary" component="h2" style={{marginBottom:12}}>Select one of the contract types below.</Typography>
+              <Typography align='left' color="inherit" component="h2" style={{marginBottom:12}}>Select one of the contract types below.</Typography>
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={6} xl={6} >
-              <ContractCard handleClick={this.props.handleProductSelect} type='Interval' heading="Interval Contract" text="Payments are made on a routine basis! You just tell us when you want to withdraw." icon={<IntervalIcon style={{fontSize:'75px', color: '#1b1b1b'}} />} />
+              <ContractCard handleClick={this.props.handleProductSelect} type='Interval' heading="Interval Contract" text="Payments are made on a routine basis! You just tell us when you want to withdraw." icon={<IntervalIcon style={{fontSize:'75px', color: 'rgba(0, 0, 0, 0.87)'}} />} />
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={6} xl={6} >
-              <ContractCard handleClick={this.props.handleProductSelect} type='Approval' heading="Approval Contract" text="A payment is made once the job is complete! You just have to tell us when you are done." icon={<ApprovalIcon style={{fontSize:'75px', color: '#1b1b1b'}}  />} />
+              <ContractCard handleClick={this.props.handleProductSelect} type='Approval' heading="Approval Contract" text="A payment is made once the job is complete! You just have to tell us when you are done." icon={<ApprovalIcon style={{fontSize:'75px', color: 'rgba(0, 0, 0, 0.87)'}}  />} />
             </Grid>
           </Grid>
-          <Grid container xs={12} direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
+          <Grid container direction="row" justify="center" spacing={0} style={{position: 'relative', marginTop: '12px'}}>
               <Grid item xs={12} sm={12} align='left'>
-                <Button size="small" variant="flat" color="secondary" disabled={this.props.loading} onClick={this.props.submitBack}>
+                <Button size="small" variant="flat" color="primary" disabled={this.props.loading} onClick={this.props.submitBack}>
                   Back
                 </Button>
               </Grid>
@@ -145,10 +145,10 @@ class SetupContract extends Component {
 
     return (
       <CardContent>
-        <Grid container xs={12} direction="row" justify="center">
-          <Grid container xs={12} alignItems="flex-start" spacing={0}>
+        <Grid container direction="row" justify="center">
+          <Grid container alignItems="flex-start" spacing={0}>
             <Grid item xs={12}>
-              <Grid container xs={12} direction="column" justify="center">
+              <Grid container direction="column" justify="center">
                 <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Setup Contract</Typography></Grid>
                 <Grid item xs={12} >
                   <TextField required fullWidth={true} color="textSecondary" required error={this.props.payerError} disabled={this.props.loading}
@@ -173,15 +173,15 @@ class SetupContract extends Component {
             </Grid>
           </Grid>
         </Grid>
-        <Grid container xs={12} direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
+        <Grid container direction="row" justify="center" spacing={0} style={{position: 'relative', marginTop: '12px'}}>
             <Grid item xs={6} sm={6} align='left'>
-              <Button size="small" variant="flat" color="secondary" disabled={this.props.loading} onClick={this.props.reset}>
+              <Button size="small" variant="flat" color="primary" disabled={this.props.loading} onClick={this.props.reset}>
                 Back
               </Button>
               {this.props.loading && <CircularProgress size={36} style={{position: 'absolute',top: '50%',left: '50%',marginTop: -12,marginLeft: -12,}}/>}
             </Grid>
             <Grid item xs={6} sm={6} align='right' >
-              <Button size="small" variant="raised" color="secondary" disabled={this.props.loading} onClick={this.props.submitSetupContract}>
+              <Button size="small" variant="raised" color="primary" disabled={this.props.loading} onClick={this.props.submitSetupContract}>
                 Done
               </Button>
               {this.props.loading && <CircularProgress size={36} style={{position: 'absolute',top: '50%',left: '50%',marginTop: -12,marginLeft: -12,}}/>}

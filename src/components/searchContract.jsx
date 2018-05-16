@@ -29,10 +29,10 @@ class ViewContract extends Component {
   render() {
     return (
       <CardContent>
-        <Grid container xs={12} direction="row" justify="center">
-          <Grid container xs={12} alignItems="flex-start" spacing={0}>
+        <Grid container direction="row" justify="center">
+          <Grid container alignItems="flex-start" spacing={0}>
             <Grid item xs={12}>
-              <Grid container xs={12} direction="column" justify="center">
+              <Grid container direction="column" justify="center">
                 <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Find your contract</Typography></Grid>
                 <Grid item xs={12} >
                   <TextField required fullWidth={true} color="textSecondary" required error={this.props.searchContractError} autoFocus disabled={this.props.loading}
@@ -46,18 +46,18 @@ class ViewContract extends Component {
             </Grid>
           </Grid>
         </Grid>
-        <Grid container xs={12} direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
+        <Grid container direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
             <Grid item xs={12} sm={12} align='right'>
-              <Button size="small" variant="raised" color="secondary" disabled={this.props.loading} onClick={this.props.submitSearchContract}>
+              <Button size="small" variant="raised" color="primary" disabled={this.props.loading} onClick={this.props.submitSearchContract}>
                 Search
               </Button>
               {this.props.loading && <CircularProgress size={36} style={{position: 'absolute',top: '50%',left: '50%',marginTop: -12,marginLeft: -12,}}/>}
             </Grid>
         </Grid>
-        <Grid container xs={12} direction="row">
+        <Grid container direction="row">
           <LinearProgress />
         </Grid>
-        <Grid container xs={12} direction="column"  spacing={0} style={{position: 'relative'}}>
+        <Grid container direction="column"  spacing={0} style={{position: 'relative'}}>
 
         </Grid>
       </CardContent>

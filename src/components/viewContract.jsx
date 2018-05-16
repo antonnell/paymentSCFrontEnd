@@ -88,10 +88,10 @@ class SearchContract extends Component {
 
     return (
       <CardContent>
-        <Grid container xs={12} direction="row" justify="center">
-          <Grid container xs={12} alignItems="flex-start" spacing={0}>
+        <Grid container direction="row" justify="center">
+          <Grid container alignItems="flex-start" spacing={0}>
             <Grid item xs={12}>
-              <Grid container xs={12} direction="row" justify="center">
+              <Grid container direction="row" justify="center">
                 <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Your Contract Information</Typography></Grid>
                 <Grid item xs={12} style={{marginTop:10,marginBottom:10}}></Grid>
                 <Grid item xs={12} sm={4}>
@@ -162,23 +162,23 @@ class SearchContract extends Component {
             </Grid>
           </Grid>
         </Grid>
-        <Grid container xs={12} direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
+        <Grid container direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
           <Grid item xs={2} sm={2} align='left' >
-            <Button style={{verticalAlign: 'middle', marginTop: '8px'}} size="small" variant="flat" color="secondary" disabled={this.props.loading} onClick={this.props.submitBack}>
+            <Button style={{verticalAlign: 'middle', marginTop: '8px'}} size="small" variant="flat" color="primary" disabled={this.props.loading} onClick={this.props.submitBack}>
               Back
             </Button>
           </Grid>
           <Grid item xs={10} sm={10} align='right'>
-            <Button style={{verticalAlign: 'middle'}} size="small" variant="flat" color="secondary" disabled={this.props.loading||this.props.contract.contractState=='Terminated'} onClick={this.props.submitDepositNavigate}>
+            <Button style={{verticalAlign: 'middle'}} size="small" variant="flat" color="primary" disabled={this.props.loading||this.props.contract.contractState=='Terminated'} onClick={this.props.submitDepositNavigate}>
               Deposit
             </Button>
-            <Button style={{verticalAlign: 'middle'}} size="small" variant="flat" color="secondary" disabled={this.props.loading} onClick={this.props.submitWithdrawNavigate}>
+            <Button style={{verticalAlign: 'middle'}} size="small" variant="flat" color="primary" disabled={this.props.loading} onClick={this.props.submitWithdrawNavigate}>
               Withdraw
             </Button>
-            <Badge color="primary" badgeContent={pendingApprovals} >
+            <Badge color="secondary" badgeContent={pendingApprovals} >
               <IconButton
                 style={{verticalAlign: 'top'}}
-                color="secondary"
+                color="primary"
                 aria-label="More"
                 buttonRef={node => {
                   this.anchorEl = node;
@@ -213,7 +213,7 @@ class SearchContract extends Component {
               <ListItem button onClick={this.props.submitUpdateUsufructNavigate}>
                 <ListItemText primary="Update Usufruct" />
               </ListItem>
-              <Badge color="primary" badgeContent={pendingApprovals} >
+              <Badge color="secondary" badgeContent={pendingApprovals} >
                 <ListItem button onClick={this.props.submitApprovalsNavigate}>
                   <ListItemText primary="Approvals" />
                 </ListItem>
@@ -223,7 +223,7 @@ class SearchContract extends Component {
           </Grid>
           {this.props.loading && <CircularProgress size={36} style={{position: 'absolute',top: '50%',left: '50%',marginTop: -12,marginLeft: -12,}}/>}
         </Grid>
-        <Grid container xs={12} direction="row">
+        <Grid container direction="row">
           <LinearProgress />
         </Grid>
       </CardContent>

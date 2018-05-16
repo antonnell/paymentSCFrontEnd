@@ -18,14 +18,14 @@ class NewAccount extends Component {
 
   render() {
     return (
-      <Grid container xs={12} justify="space-around" alignItems="center" direction="row" spacing={0}>
-        <Grid container xs={12} justify="space-around" alignItems="center" direction="row" spacing={0}>
+      <Grid container justify="space-around" alignItems="center" direction="row" spacing={0}>
+        <Grid container justify="space-around" alignItems="center" direction="row" spacing={0}>
           <Grid item xs={10} sm={6} md={4} lg={3} style={{marginTop: '100px'}} align='center'>
             <Typography variant="headline" color="inherit">
               BitDiem Network
             </Typography>
           </Grid>
-        </Grid><Grid container xs={12} justify="space-around" alignItems="center" direction="row" spacing={0}>
+        </Grid><Grid container justify="space-around" alignItems="center" direction="row" spacing={0}>
           <Grid item xs={10} sm={6} md={4} lg={3} style={{marginTop: '80px'}}>
             <TextField required fullWidth={true} color="textSecondary" error={this.props.emailAddressError} disabled={this.props.loading}
               id="emailAddress" label="Email Address" value={this.props.emailAddress}

@@ -23,7 +23,7 @@ class WithdrawContract extends Component {
     if(this.props.loaded) {
       var address = 'https://rinkeby.etherscan.io/tx/'+this.props.withdrawContractHash
       return(<CardContent>
-        <Grid container xs={12} direction="row" justify="center">
+        <Grid container direction="row" justify="center">
           <Grid item xs={12}>
             <Typography align='center' color="textSecondary" variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Withdrawal is complete!</Typography>
           </Grid>
@@ -37,7 +37,7 @@ class WithdrawContract extends Component {
             <Typography align='center' color="textSecondary" component="h2">You can view the <b>progress</b> of the transaction at <a href={address}>{address}</a>.</Typography>
           </Grid>
         </Grid>
-        <Grid container xs={12} direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
+        <Grid container direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
           <Grid item xs={12} sm={12} align='left'>
             <Button size="small" onClick={this.props.submitBack}>Back</Button>
           </Grid>
@@ -47,10 +47,10 @@ class WithdrawContract extends Component {
 
     return (
         <CardContent>
-          <Grid container xs={12} direction="row" justify="center">
-            <Grid container xs={12} alignItems="flex-start" spacing={0}>
+          <Grid container direction="row" justify="center">
+            <Grid container alignItems="flex-start" spacing={0}>
               <Grid item xs={12}>
-                <Grid container xs={12} direction="column" justify="center">
+                <Grid container direction="column" justify="center">
                   <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Withdraw Contract</Typography></Grid>
                   <Grid item xs={12}><Typography align='center'>{"For more information, head over to https://www.bitdiem.com/"}</Typography></Grid>
                   <Grid item xs={12}>
@@ -66,21 +66,21 @@ class WithdrawContract extends Component {
               </Grid>
             </Grid>
           </Grid>
-          <Grid container xs={12} direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
+          <Grid container direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
             <Grid item xs={6} sm={6} align='left' >
-              <Button size="small" variant="flat" color="secondary" disabled={this.props.loading} onClick={this.props.submitBack}>
+              <Button size="small" variant="flat" color="primary" disabled={this.props.loading} onClick={this.props.submitBack}>
                 Back
               </Button>
               {this.props.loading && <CircularProgress size={36} style={{position: 'absolute',top: '50%',left: '50%',marginTop: -12,marginLeft: -12,}}/>}
             </Grid>
             <Grid item xs={6} sm={6} align='right'>
-              <Button size="small" variant="raised" color="secondary" disabled={this.props.loading} onClick={this.props.submitWithdrawContract}>
+              <Button size="small" variant="raised" color="primary" disabled={this.props.loading} onClick={this.props.submitWithdrawContract}>
                 Withdraw
               </Button>
               {this.props.loading && <CircularProgress size={36} style={{position: 'absolute',top: '50%',left: '50%',marginTop: -12,marginLeft: -12,}}/>}
             </Grid>
           </Grid>
-          <Grid container xs={12} direction="row">
+          <Grid container direction="row">
             <LinearProgress />
           </Grid>
         </CardContent>

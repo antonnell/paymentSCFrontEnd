@@ -18,10 +18,10 @@ class MyProfile extends Component {
   render() {
     return (
       <CardContent>
-        <Grid container xs={12} direction="row" justify="center">
-          <Grid container xs={12} alignItems="flex-start" spacing={0}>
+        <Grid container direction="row" justify="center">
+          <Grid container alignItems="flex-start" spacing={0}>
             <Grid item xs={12}>
-              <Grid container xs={12} direction="row" justify="center">
+              <Grid container direction="row" justify="center">
                 <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>Your Profile</Typography></Grid>
                 <Grid item xs={12} style={{marginTop:10,marginBottom:10}}></Grid>
                 <Grid item xs={12} sm={12} align='center'>
@@ -32,9 +32,9 @@ class MyProfile extends Component {
             </Grid>
           </Grid>
         </Grid>
-        <Grid container xs={12} direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
+        <Grid container direction="row" justify="center" spacing={0} style={{position: 'relative'}}>
           <Grid item xs={12} sm={12} align='left' >
-            <Button style={{verticalAlign: 'middle', marginTop: '8px'}} size="small" variant="flat" color="secondary" disabled={this.props.loading} onClick={this.props.submitBack}>
+            <Button style={{verticalAlign: 'middle', marginTop: '8px'}} size="small" variant="flat" color="primary" disabled={this.props.loading} onClick={this.props.submitBack}>
               Back
             </Button>
           </Grid>

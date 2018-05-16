@@ -21,10 +21,10 @@ class MetamaskRequired extends Component {
   render() {
     return (
       <CardContent>
-        <Grid container xs={12} direction="row" justify="center">
-          <Grid container xs={12} alignItems="flex-start" spacing={0}>
+        <Grid container direction="row" justify="center">
+          <Grid container alignItems="flex-start" spacing={0}>
             <Grid item xs={12}>
-              <Grid container xs={12} direction="column" justify="center">
+              <Grid container direction="column" justify="center">
                 <Grid item xs={12}><Typography align='center' variant="headline" component="h2" style={{marginTop:50,marginBottom:50}}>BitDiem Metamask</Typography></Grid>
                 <Grid item xs={12}><Typography align='center'>We could not find MetaMask on your system. Unfortunately you require metamask to continue using the <b>BitDiem</b> network.</Typography></Grid>
                 <Grid item xs={12}><Typography align='center'>For instructions on how to set up your <b>MetaMask extension</b>, please head to href <a href="https://metamask.io/">https://metamask.io/</a></Typography></Grid>
@@ -40,7 +40,7 @@ class MetamaskRequired extends Component {
             </Grid>
           </Grid>
         </Grid>
-        <Grid container xs={12} direction="row">
+        <Grid container direction="row">
           <LinearProgress />
         </Grid>
       </CardContent>

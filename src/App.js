@@ -81,7 +81,7 @@ function MenuIcon(props) {
 
 
 const theme = createMuiTheme({
-  palette: {
+  /*palette: {
     primary: {
       light: '#ffff55',
       main: '#ffe400',
@@ -94,7 +94,7 @@ const theme = createMuiTheme({
       dark: '#1b1b1b',
       contrastText: '#ffffff',
     }
-  },
+  },*/
   /*palette: {
     primary: {
       light: '#ffff55',
@@ -109,6 +109,20 @@ const theme = createMuiTheme({
       contrastText: '#ffffff',
     }
   },*/
+  palette: {
+    primary: {
+      light: '#6681ff',
+      main: '#0055eb',
+      dark: '#002db7',
+      contrastText: '#ffffff',
+    },
+    secondary: {
+      light: '#ffed4d',
+      main: '#ffbb00',
+      dark: '#c78b00',
+      contrastText: '#000000',
+    }
+  },
 });
 
 class App extends Component {
@@ -1299,7 +1313,7 @@ class App extends Component {
 
     var styles = {
       headerBackground: {
-        backgroundColor: '#ffe400',
+        backgroundColor: '#0055eb',
         maxHeight:250,
         borderBottom: '1px solid #777777'
       }
@@ -1352,15 +1366,15 @@ class App extends Component {
               <IconButton color="inherit" aria-label="Menu" onClick={() => { this.openDrawer(); }}>
                 <MenuIcon />
               </IconButton>
-              <Typography variant="title" color="inherit" style={{flex: 1}}>
-                BitDiem Network
-              </Typography>
+              <div style={{flex: 1}}>
+                <img src="LogoWhite@2x.png" width="90px" height="24px" alt="" />
+              </div>
             </Toolbar>
           </AppBar>
           <AppDrawer open={this.state.drawerOpen} closeDrawer={this.closeDrawer} navClicked={this.navClicked} navValue={this.navValue} />
           <CssBaseline />
-          <Grid container xs={12} justify="space-around" alignItems="center" direction="row" spacing={0}>
-            <Grid container xs={12} justify="space-around" alignItems="center" direction="row" spacing={0}>
+          <Grid container justify="space-around" alignItems="center" direction="row" spacing={0}>
+            <Grid container justify="space-around" alignItems="center" direction="row" spacing={0}>
               <Grid item xs={12} sm={8} md={6} lg={4} style={{}}>
                 <Card raised elevation={0} square={false}  style={cardStyle}>
                   {this.renderScreen()}
@@ -1404,14 +1418,14 @@ class App extends Component {
                 <IconButton color="inherit" aria-label="Menu" onClick={() => { this.openDrawer(); }}>
                   <MenuIcon />
                 </IconButton>
-                <Typography variant="title" color="inherit">
-                  BitDiem Network
-                </Typography>
+                <div style={{flex: 1}}>
+                  <img src="LogoWhite@2x.png" width="90px" height="24px" alt="" />
+                </div>
               </Toolbar>
             </AppBar>
             <AppDrawer open={this.state.drawerOpen} closeDrawer={this.closeDrawer} navClicked={this.navClicked} navValue={this.navValue} />
             <CssBaseline />
-            <Grid container xs={12} justify="space-around" alignItems="center" direction="row" spacing={0} style={{marginBottom: '60px'}}>
+            <Grid container justify="space-around" alignItems="center" direction="row" spacing={0} style={{marginBottom: '60px'}}>
               <Grid container xs={11} justify="space-around" direction="row" spacing={0}>
                 <Grid item xs={false} sm={2} md={3} lg={3} style={{marginTop: '120px'}}>
                 </Grid>
